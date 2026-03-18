@@ -1,46 +1,104 @@
 "use client";
 
+import MonthlyBarChart from "@/components/dashboard/MonthlyBarChart";
+import RecentTransactions from "@/components/dashboard/RecentTransactions";
+import SummaryCard from "@/components/dashboard/SummaryCard";
+import { Button } from "@/components/ui/button";
 import { useSummary } from "@/hooks/useSummary";
-import { formatCurrency } from "@/lib/format";
+import { useTransactions } from "@/hooks/useTransactions";
+import { useYearlyReport } from "@/hooks/useYearlyReport";
+import { formatMonth } from "@/lib/format";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
-export default function Home() {
-  const { summary, loading, error } = useSummary();
+export default function DashboardPage() {
+  const today = new Date();
+  const [year, setYear]   = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth() + 1);
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-[50vh]">
-      <p className="text-muted-foreground">Loading...</p>
-    </div>
-  );
+  const { summary, loading: summaryLoading } = useSummary({
+    type: "month",
+    year,
+    month,
+  });
 
-  if (error) return (
-    <div className="flex items-center justify-center min-h-[50vh]">
-      <p className="text-destructive">❌ {error}</p>
-    </div>
-  );
+  const { transactions, loading: txLoading } = useTransactions();
+  const { report, loading: reportLoading }   = useYearlyReport(year);
+
+  const prevMonth = () => {
+    if (month === 1) { setMonth(12); setYear((y) => y - 1); }
+    else setMonth((m) => m - 1);
+  };
+
+  const nextMonth = () => {
+    if (month === 12) { setMonth(1); setYear((y) => y + 1); }
+    else setMonth((m) => m + 1);
+  };
 
   return (
-    <div className="text-center space-y-4">
-      <h1 className="text-4xl font-bold">💰 Expense Tracker</h1>
-      <div className="flex justify-center gap-8 mt-8">
+    <div className="space-y-6">
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">Total Income</p>
-          <p className="text-2xl font-bold text-green-500">
-            {formatCurrency(summary.totalIncome)}
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground text-sm">
+            Personal Finance Overview
           </p>
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Total Expense</p>
-          <p className="text-2xl font-bold text-red-500">
-            {formatCurrency(summary.totalExpense)}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Balance</p>
-          <p className="text-2xl font-bold">
-            {formatCurrency(summary.balance)}
-          </p>
+
+        {/* Month Selector */}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" onClick={prevMonth}>
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <span className="text-sm font-medium w-32 text-center">
+            {formatMonth(month)} {year}
+          </span>
+          <Button variant="outline" size="icon" onClick={nextMonth}>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
         </div>
       </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <SummaryCard
+          title="Total Income"
+          amount={summary.totalIncome}
+          icon="💰"
+          variant="income"
+          loading={summaryLoading}
+        />
+        <SummaryCard
+          title="Total Expense"
+          amount={summary.totalExpense}
+          icon="💸"
+          variant="expense"
+          loading={summaryLoading}
+        />
+        <SummaryCard
+          title="Balance"
+          amount={summary.balance}
+          icon="🏦"
+          variant="balance"
+          loading={summaryLoading}
+        />
+      </div>
+
+      {/* Monthly Bar Chart */}
+      <MonthlyBarChart
+        data={report}
+        year={year}
+        loading={reportLoading}
+      />
+
+      {/* Recent Transactions */}
+      <RecentTransactions
+        transactions={transactions}
+        loading={txLoading}
+      />
+
     </div>
   );
 }
