@@ -129,8 +129,3 @@ npm run dev
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000
 ```
-<!-- pr 1 -->
-
-<!-- pr 2 -->
-
-<!-- pr 4 -->
