@@ -9,9 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ========================
-// Services
-// ========================
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
@@ -19,15 +16,18 @@ builder.Services.AddOpenApi();
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 10,
+            maxRetryDelay: TimeSpan.FromSeconds(15),
+            errorNumbersToAdd: null
+        )
     )
 );
 
-// Repository + Service
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -41,16 +41,15 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // ========================
-// Auto Migration + Seed
+// Auto Create DB + Seed
 // ========================
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-    // Auto apply migration
-    db.Database.Migrate();
+    // ✅ Tự tạo table không cần migration
+    db.Database.EnsureCreated();
 
-    // Seed data nếu chưa có
     if (!db.Transactions.Any())
     {
         var now = DateTime.UtcNow;
