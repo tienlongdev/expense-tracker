@@ -1,3 +1,5 @@
+using ExpenseTracker.Application.Interfaces;
+using ExpenseTracker.Application.Services;
 using ExpenseTracker.Domain.Interfaces;
 using ExpenseTracker.Infrastructure.Data;
 using ExpenseTracker.Infrastructure.Repositories;
@@ -19,8 +21,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-// Repository
+// Repository + Service
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 // CORS
 builder.Services.AddCors(options =>
