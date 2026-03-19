@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<Debt> Debts => Set<Debt>();
     public DbSet<DebtPayment> DebtPayments => Set<DebtPayment>();
+    public DbSet<SavingsAccount> SavingsAccounts => Set<SavingsAccount>();
+    public DbSet<SavingsHistory> SavingsHistories => Set<SavingsHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -82,6 +84,48 @@ public class AppDbContext : DbContext
             entity.HasOne(p => p.Debt)
                   .WithMany(d => d.Payments)
                   .HasForeignKey(p => p.DebtId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================
+        // SavingsAccount
+        // ========================
+        modelBuilder.Entity<SavingsAccount>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Type).HasConversion<int>().IsRequired();
+            entity.Property(e => e.InitialAmount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.TotalDeposited).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.CurrentValue).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.InterestRate).HasColumnType("decimal(5,2)");
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+        });
+
+        // ========================
+        // SavingsHistory
+        // ========================
+        modelBuilder.Entity<SavingsHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.TransactionType).HasConversion<int>().IsRequired();
+            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.PreviousValue).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.NewValue).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.Date).IsRequired();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+            // Ignore computed property
+            entity.Ignore(e => e.ProfitLoss);
+
+            entity.HasOne(h => h.SavingsAccount)
+                  .WithMany(a => a.History)
+                  .HasForeignKey(h => h.SavingsAccountId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }
