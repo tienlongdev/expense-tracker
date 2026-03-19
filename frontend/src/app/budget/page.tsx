@@ -3,12 +3,11 @@
 import BudgetForm from "@/components/budget/BudgetForm";
 import BudgetList from "@/components/budget/BudgetList";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useBudget } from "@/hooks/useBudget";
 import { useCategories } from "@/hooks/useCategories";
@@ -112,13 +111,13 @@ export default function BudgetPage() {
         <div className="flex items-center gap-2">
           {/* Month navigation */}
           <div className="flex items-center gap-1 bg-muted rounded-lg px-1">
-            <Button size="icon-xs" variant="ghost" onClick={() => navMonth(-1)}>
+            <Button size="icon" className="h-7 w-7" variant="ghost" onClick={() => navMonth(-1)}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <span className="text-sm font-medium px-2 min-w-[80px] text-center">
               {MONTHS[month - 1]} {year}
             </span>
-            <Button size="icon-xs" variant="ghost" onClick={() => navMonth(1)}>
+            <Button size="icon" className="h-7 w-7" variant="ghost" onClick={() => navMonth(1)}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
@@ -136,36 +135,31 @@ export default function BudgetPage() {
       {/* Overview cards */}
       {overview && (
         <div className="grid grid-cols-3 gap-3">
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Tổng kế hoạch</p>
-              <p className="text-lg font-bold">{formatCurrency(overview.totalPlanned)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Đã chi</p>
-              <p
-                className={`text-lg font-bold ${
-                  overview.totalActual > overview.totalPlanned ? "text-red-500" : "text-foreground"
-                }`}
-              >
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className="h-0.5 bg-blue-500" />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tổng kế hoạch</p>
+              <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(overview.totalPlanned)}</p>
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className={`h-0.5 ${overview.totalActual > overview.totalPlanned ? "bg-red-500" : "bg-orange-400"}`} />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Đã chi</p>
+              <p className={`text-lg font-bold tabular-nums mt-0.5 ${overview.totalActual > overview.totalPlanned ? "text-red-500" : "text-foreground"}`}>
                 {formatCurrency(overview.totalActual)}
               </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Còn lại</p>
-              <p
-                className={`text-lg font-bold ${
-                  overview.totalRemaining < 0 ? "text-red-500" : "text-green-500"
-                }`}
-              >
-                {formatCurrency(overview.totalRemaining)}
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className={`h-0.5 ${overview.totalRemaining < 0 ? "bg-red-500" : "bg-green-500"}`} />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Còn lại</p>
+              <p className={`text-lg font-bold tabular-nums mt-0.5 ${overview.totalRemaining < 0 ? "text-red-500" : "text-green-500"}`}>
+                {overview.totalRemaining < 0 ? "\u2212" : ""}{formatCurrency(Math.abs(overview.totalRemaining))}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 

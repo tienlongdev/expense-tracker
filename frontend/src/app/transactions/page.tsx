@@ -4,18 +4,18 @@ import TransactionForm from "@/components/transaction/TransactionForm";
 import TransactionList from "@/components/transaction/TransactionList";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useTransactionMutations } from "@/hooks/useTransactionMutations";
 import { useTransactions } from "@/hooks/useTransactions";
 import { formatCurrency } from "@/lib/format";
 import {
-    CreateTransactionDto,
-    Transaction,
-    UpdateTransactionDto,
+  CreateTransactionDto,
+  Transaction,
+  UpdateTransactionDto,
 } from "@/types/transaction";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -67,37 +67,45 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Transactions</h1>
+          <h1 className="text-2xl font-bold">Giao dịch</h1>
           <p className="text-muted-foreground text-sm">
-            {transactions.length} transactions total
+            {transactions.length} giao dịch
           </p>
         </div>
         <Button onClick={handleOpenAdd}>
           <Plus className="w-4 h-4 mr-2" />
-          Add Transaction
+          Thêm giao dịch
         </Button>
       </div>
 
       {/* Summary Bar */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-lg border bg-card p-4 text-center">
-          <p className="text-sm text-muted-foreground">Total Income</p>
-          <p className="text-xl font-bold text-green-500">
-            {formatCurrency(totalIncome)}
-          </p>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="h-0.5 bg-green-500" />
+          <div className="p-4 text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Tổng thu</p>
+            <p className="text-lg font-bold text-green-500 tabular-nums mt-0.5">
+              {formatCurrency(totalIncome)}
+            </p>
+          </div>
         </div>
-        <div className="rounded-lg border bg-card p-4 text-center">
-          <p className="text-sm text-muted-foreground">Total Expense</p>
-          <p className="text-xl font-bold text-red-500">
-            {formatCurrency(totalExpense)}
-          </p>
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="h-0.5 bg-red-500" />
+          <div className="p-4 text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Tổng chi</p>
+            <p className="text-lg font-bold text-red-500 tabular-nums mt-0.5">
+              {formatCurrency(totalExpense)}
+            </p>
+          </div>
         </div>
-        <div className="rounded-lg border bg-card p-4 text-center">
-          <p className="text-sm text-muted-foreground">Balance</p>
-          <p className={`text-xl font-bold
-            ${totalIncome - totalExpense >= 0 ? "text-green-500" : "text-red-500"}`}>
-            {formatCurrency(totalIncome - totalExpense)}
-          </p>
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className={`h-0.5 ${totalIncome - totalExpense >= 0 ? "bg-blue-500" : "bg-orange-500"}`} />
+          <div className="p-4 text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">Số dư</p>
+            <p className={`text-lg font-bold tabular-nums mt-0.5 ${totalIncome - totalExpense >= 0 ? "text-blue-500" : "text-orange-500"}`}>
+              {formatCurrency(totalIncome - totalExpense)}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -114,7 +122,7 @@ export default function TransactionsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingTransaction ? "Edit Transaction" : "Add Transaction"}
+              {editingTransaction ? "Sửa giao dịch" : "Thêm giao dịch"}
             </DialogTitle>
           </DialogHeader>
           <TransactionForm

@@ -4,12 +4,11 @@ import DebtForm from "@/components/debt/DebtForm";
 import DebtList from "@/components/debt/DebtList";
 import PaymentForm from "@/components/debt/PaymentForm";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useDebt } from "@/hooks/useDebt";
 import { formatCurrency } from "@/lib/format";
@@ -111,50 +110,52 @@ export default function DebtPage() {
       {/* Summary cards */}
       {summary && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Tôi đang nợ</p>
-              <p className="text-lg font-bold text-red-500">
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className="h-0.5 bg-red-500" />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tôi đang nợ</p>
+              <p className="text-lg font-bold tabular-nums mt-0.5 text-red-500">
                 {formatCurrency(summary.totalBorrowed)}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground tabular-nums mt-0.5">
                 Còn lại: {formatCurrency(summary.totalBorrowedRemaining)}
               </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Người khác nợ tôi</p>
-              <p className="text-lg font-bold text-blue-500">
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className="h-0.5 bg-blue-500" />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Người khác nợ tôi</p>
+              <p className="text-lg font-bold tabular-nums mt-0.5 text-blue-500">
                 {formatCurrency(summary.totalLent)}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground tabular-nums mt-0.5">
                 Còn lại: {formatCurrency(summary.totalLentRemaining)}
               </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Quá hạn</p>
-              <p className={`text-lg font-bold ${summary.overdueCount > 0 ? "text-red-500" : "text-muted-foreground"}`}>
-                {summary.overdueCount} khoản
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className={`h-0.5 ${summary.overdueCount > 0 ? "bg-orange-500" : "bg-muted"}`} />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quá hạn</p>
+              <p className={`text-lg font-bold tabular-nums mt-0.5 ${summary.overdueCount > 0 ? "text-orange-500" : "text-muted-foreground"}`}>
+                {summary.overdueCount} <span className="text-sm font-normal">khoản</span>
               </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Số dư thực</p>
-              <p
-                className={`text-lg font-bold ${
-                  summary.totalLentRemaining - summary.totalBorrowedRemaining >= 0
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
-              >
-                {formatCurrency(summary.totalLentRemaining - summary.totalBorrowedRemaining)}
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            {(() => { const net = summary.totalLentRemaining - summary.totalBorrowedRemaining; return (
+              <>
+                <div className={`h-0.5 ${net >= 0 ? "bg-green-500" : "bg-red-500"}`} />
+                <div className="p-4">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Số dư thực</p>
+                  <p className={`text-lg font-bold tabular-nums mt-0.5 ${net >= 0 ? "text-green-500" : "text-red-500"}`}>
+                    {net >= 0 ? "+" : "\u2212"}{formatCurrency(Math.abs(net))}
+                  </p>
+                </div>
+              </>
+            ); })()}
+          </div>
         </div>
       )}
 

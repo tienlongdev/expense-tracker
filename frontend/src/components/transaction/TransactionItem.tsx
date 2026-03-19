@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { Transaction, TransactionType } from "@/types/transaction";
@@ -22,59 +21,76 @@ export default function TransactionItem({
   const isIncome = transaction.type === TransactionType.Income;
 
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+    <div className="group flex items-center gap-4 px-4 py-3 rounded-xl border border-border/60 bg-card hover:border-border hover:shadow-sm transition-all duration-150">
 
-      {/* Left — Icon + Info */}
-      <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg
-          ${isIncome ? "bg-green-500" : "bg-red-500"}`}>
-          {isIncome ? "↑" : "↓"}
-        </div>
-        <div>
-          <p className="font-medium">{transaction.title}</p>
-          <div className="flex items-center gap-2 mt-0.5">
-            <Badge variant="secondary" className="text-xs">
-              {transaction.category}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
-              {formatDate(transaction.date)}
-            </span>
-          </div>
+      {/* Icon */}
+      <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold
+        ${isIncome ? "bg-green-500/15 text-green-500" : "bg-red-500/15 text-red-500"}`}>
+        {isIncome ? "↑" : "↓"}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-sm truncate">{transaction.title}</p>
+        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium
+            ${isIncome ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"}`}>
+            {transaction.categoryName ?? transaction.category}
+          </span>
+          <span className="text-[11px] text-muted-foreground">{formatDate(transaction.date)}</span>
           {transaction.note && (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {transaction.note}
-            </p>
+            <span className="text-[11px] text-muted-foreground truncate max-w-[140px]">
+              · {transaction.note}
+            </span>
           )}
         </div>
       </div>
 
-      {/* Right — Amount + Actions */}
-      <div className="flex items-center gap-3">
-        <span className={`font-bold text-lg
-          ${isIncome ? "text-green-500" : "text-red-500"}`}>
-          {isIncome ? "+" : "-"}{formatCurrency(transaction.amount)}
-        </span>
+      {/* Amount */}
+      <span className={`shrink-0 font-bold text-sm tabular-nums
+        ${isIncome ? "text-green-500" : "text-red-500"}`}>
+        {isIncome ? "+" : "−"}{formatCurrency(transaction.amount)}
+      </span>
 
+      {/* Actions */}
+      <div className="shrink-0 flex items-center gap-1">
         {!confirmDelete ? (
-          <div className="flex gap-1">
-            <Button size="icon" variant="ghost"
-              onClick={() => onEdit(transaction)}>
-              <Pencil className="w-4 h-4" />
+          <>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => onEdit(transaction)}
+            >
+              <Pencil className="w-3.5 h-3.5" />
             </Button>
-            <Button size="icon" variant="ghost"
-              onClick={() => setConfirmDelete(true)}>
-              <Trash2 className="w-4 h-4 text-destructive" />
+            <Button
+              size="icon"
+              variant="ghost"
+              className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => setConfirmDelete(true)}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
             </Button>
-          </div>
+          </>
         ) : (
-          <div className="flex gap-1">
-            <Button size="sm" variant="destructive"
-              onClick={() => onDelete(transaction.id)}>
-              Confirm
+          <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-2 duration-150">
+            <span className="text-xs text-muted-foreground mr-1">Xoá?</span>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="h-7 px-2.5 text-xs"
+              onClick={() => onDelete(transaction.id)}
+            >
+              Xoá
             </Button>
-            <Button size="sm" variant="outline"
-              onClick={() => setConfirmDelete(false)}>
-              Cancel
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2.5 text-xs"
+              onClick={() => setConfirmDelete(false)}
+            >
+              Huỷ
             </Button>
           </div>
         )}

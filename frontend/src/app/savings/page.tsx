@@ -4,22 +4,21 @@ import SavingsAccountForm from "@/components/savings/SavingsAccountForm";
 import SavingsAccountList from "@/components/savings/SavingsAccountList";
 import SavingsTransactionForm, { SavingsTxType } from "@/components/savings/SavingsTransactionForm";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useSavings } from "@/hooks/useSavings";
 import { formatCurrency } from "@/lib/format";
 import { savingsApi } from "@/lib/savings-api";
 import {
-    CreateSavingsAccountDto,
-    SavingsAccount,
-    SavingsHistoryDto,
-    SavingsStatus,
-    UpdateSavingsAccountDto,
+  CreateSavingsAccountDto,
+  SavingsAccount,
+  SavingsHistoryDto,
+  SavingsStatus,
+  UpdateSavingsAccountDto,
 } from "@/types/savings";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -161,43 +160,41 @@ export default function SavingsPage() {
       {/* Summary */}
       {summary && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Tổng vốn</p>
-              <p className="text-lg font-bold">{formatCurrency(summary.totalPrincipal)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Giá trị hiện tại</p>
-              <p className="text-lg font-bold">{formatCurrency(summary.totalCurrentValue)}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Lời / Lỗ</p>
-              <p
-                className={`text-lg font-bold ${
-                  summary.totalProfitLoss >= 0 ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {summary.totalProfitLoss >= 0 ? "+" : ""}
-                {formatCurrency(summary.totalProfitLoss)}
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className="h-0.5 bg-blue-500" />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tổng vốn</p>
+              <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(summary.totalPrincipal)}</p>
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className="h-0.5 bg-indigo-500" />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Giá trị hiện tại</p>
+              <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(summary.totalCurrentValue)}</p>
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className={`h-0.5 ${summary.totalProfitLoss >= 0 ? "bg-green-500" : "bg-red-500"}`} />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Lời / Lỗ</p>
+              <p className={`text-lg font-bold tabular-nums mt-0.5 ${summary.totalProfitLoss >= 0 ? "text-green-500" : "text-red-500"}`}>
+                {summary.totalProfitLoss >= 0 ? "+" : "\u2212"}{formatCurrency(Math.abs(summary.totalProfitLoss))}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {summary.profitLossPercentage >= 0 ? "+" : ""}
-                {summary.profitLossPercentage?.toFixed(1)}%
+              <p className="text-xs text-muted-foreground tabular-nums">
+                {summary.profitLossPercentage >= 0 ? "+" : "\u2212"}{Math.abs(summary.profitLossPercentage ?? 0).toFixed(1)}%
               </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">Đang hoạt động</p>
-              <p className="text-lg font-bold">
-                {summary.activeCount} / {summary.totalCount}
+            </div>
+          </div>
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+            <div className="h-0.5 bg-emerald-500" />
+            <div className="p-4">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Đang hoạt động</p>
+              <p className="text-lg font-bold tabular-nums mt-0.5">
+                {summary.activeCount} <span className="text-sm font-normal text-muted-foreground">/ {summary.totalCount}</span>
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
 
@@ -295,7 +292,7 @@ export default function SavingsPage() {
               {history.map((h) => (
                 <div
                   key={h.id}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-border"
+                  className="flex items-center justify-between px-3 py-2.5 rounded-lg ring-1 ring-border/60 bg-card"
                 >
                   <div>
                     <p className="text-xs font-medium">{h.transactionType}</p>
@@ -305,8 +302,8 @@ export default function SavingsPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-semibold">{formatCurrency(h.amount)}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs font-semibold tabular-nums">{formatCurrency(h.amount)}</p>
+                    <p className="text-xs text-muted-foreground tabular-nums">
                       → {formatCurrency(h.currentValueAfter)}
                     </p>
                   </div>
