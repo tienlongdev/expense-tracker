@@ -12,7 +12,9 @@ public class Transaction
 
     public TransactionType Type { get; set; }
 
-    public string Category { get; set; } = string.Empty;
+    // FK → Category
+    public Guid CategoryId { get; set; }
+    public Category? Category { get; set; }
 
     public DateTime Date { get; set; }
 

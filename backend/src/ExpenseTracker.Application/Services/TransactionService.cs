@@ -38,7 +38,7 @@ public class TransactionService : ITransactionService
             Title = dto.Title,
             Amount = dto.Amount,
             Type = dto.Type,
-            Category = dto.Category,
+            CategoryId = dto.CategoryId,
             Date = dto.Date,
             Note = dto.Note
         };
@@ -55,7 +55,7 @@ public class TransactionService : ITransactionService
         existing.Title = dto.Title;
         existing.Amount = dto.Amount;
         existing.Type = dto.Type;
-        existing.Category = dto.Category;
+        existing.CategoryId = dto.CategoryId;
         existing.Date = dto.Date;
         existing.Note = dto.Note;
 
@@ -64,9 +64,7 @@ public class TransactionService : ITransactionService
     }
 
     public async Task<bool> DeleteAsync(Guid id)
-    {
-        return await _repository.DeleteAsync(id);
-    }
+        => await _repository.DeleteAsync(id);
 
     // ========================
     // Filter
@@ -98,64 +96,41 @@ public class TransactionService : ITransactionService
     {
         var income = await _repository.GetTotalByTypeAsync(TransactionType.Income);
         var expense = await _repository.GetTotalByTypeAsync(TransactionType.Expense);
-
-        return new SummaryDto
-        {
-            TotalIncome = income,
-            TotalExpense = expense
-        };
+        return new SummaryDto { TotalIncome = income, TotalExpense = expense };
     }
 
     public async Task<SummaryDto> GetSummaryByMonthAsync(int year, int month)
     {
         var income = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Income, year, month);
         var expense = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Expense, year, month);
-
-        return new SummaryDto
-        {
-            TotalIncome = income,
-            TotalExpense = expense
-        };
+        return new SummaryDto { TotalIncome = income, TotalExpense = expense };
     }
 
     public async Task<SummaryDto> GetSummaryByYearAsync(int year)
     {
         var income = await _repository.GetTotalByTypeAndYearAsync(TransactionType.Income, year);
         var expense = await _repository.GetTotalByTypeAndYearAsync(TransactionType.Expense, year);
-
-        return new SummaryDto
-        {
-            TotalIncome = income,
-            TotalExpense = expense
-        };
+        return new SummaryDto { TotalIncome = income, TotalExpense = expense };
     }
 
     // ========================
-    // Yearly Report
+    // Report
     // ========================
 
     public async Task<IEnumerable<MonthlyReportDto>> GetYearlyReportAsync(int year)
     {
         var report = new List<MonthlyReportDto>();
-
-        for (int month = 1; month <= 12; month++)
+        for (int m = 1; m <= 12; m++)
         {
-            var income = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Income, year, month);
-            var expense = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Expense, year, month);
-
-            report.Add(new MonthlyReportDto
-            {
-                Month = month,
-                TotalIncome = income,
-                TotalExpense = expense
-            });
+            var income = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Income, year, m);
+            var expense = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Expense, year, m);
+            report.Add(new MonthlyReportDto { Month = m, Year = year, TotalIncome = income, TotalExpense = expense   });
         }
-
         return report;
     }
 
     // ========================
-    // Mapper (private)
+    // Mapping
     // ========================
 
     private static TransactionDto MapToDto(Transaction t) => new()
@@ -164,7 +139,10 @@ public class TransactionService : ITransactionService
         Title = t.Title,
         Amount = t.Amount,
         Type = t.Type,
-        Category = t.Category,
+        CategoryId = t.CategoryId,
+        CategoryName = t.Category?.Name ?? string.Empty,
+        CategoryIcon = t.Category?.Icon,
+        CategoryColor = t.Category?.Color,
         Date = t.Date,
         Note = t.Note,
         CreatedAt = t.CreatedAt

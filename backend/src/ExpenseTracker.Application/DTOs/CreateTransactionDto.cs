@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTracker.Application.DTOs;
 
-// Request DTO — nhận từ client khi tạo mới
 public class CreateTransactionDto
 {
     [Required]
@@ -17,9 +16,8 @@ public class CreateTransactionDto
     [Required]
     public TransactionType Type { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public string Category { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Vui lòng chọn danh mục")]
+    public Guid CategoryId { get; set; }
 
     [Required]
     public DateTime Date { get; set; }
