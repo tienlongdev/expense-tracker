@@ -4,10 +4,10 @@ import CategoryForm from "@/components/category/CategoryForm";
 import CategoryList from "@/components/category/CategoryList";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { useCategories } from "@/hooks/useCategories";
 import { Category, CreateCategoryDto, UpdateCategoryDto } from "@/types/category";
@@ -88,6 +88,31 @@ export default function CategoryPage() {
         </Button>
       </div>
 
+      {/* Summary mini-cards */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="h-0.5 bg-primary" />
+          <div className="p-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tất cả</p>
+            <p className="text-lg font-bold tabular-nums mt-0.5">{categories.length}</p>
+          </div>
+        </div>
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="h-0.5 bg-green-500" />
+          <div className="p-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Thu nhập</p>
+            <p className="text-lg font-bold tabular-nums mt-0.5 text-green-500">{incomeCount}</p>
+          </div>
+        </div>
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="h-0.5 bg-red-500" />
+          <div className="p-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Chi tiêu</p>
+            <p className="text-lg font-bold tabular-nums mt-0.5 text-red-500">{expenseCount}</p>
+          </div>
+        </div>
+      </div>
+
       {/* Tabs */}
       <div className="flex gap-2">
         {(["all", "income", "expense"] as const).map((t) => (
@@ -96,7 +121,11 @@ export default function CategoryPage() {
             onClick={() => setTab(t)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
               tab === t
-                ? "bg-primary text-primary-foreground"
+                ? t === "income"
+                  ? "bg-green-500 text-white"
+                  : t === "expense"
+                  ? "bg-red-500 text-white"
+                  : "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >

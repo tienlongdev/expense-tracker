@@ -9,7 +9,9 @@ export interface Transaction {
   amount: number;
   type: TransactionType;
   typeName: string; // "Income" | "Expense"
-  category: string;
+  categoryId: string;
+  categoryName: string;
+  category: string; // alias for display (categoryName)
   date: string;     // ISO string
   note?: string;
   createdAt: string;
@@ -19,7 +21,7 @@ export interface CreateTransactionDto {
   title: string;
   amount: number;
   type: TransactionType;
-  category: string;
+  categoryId: string;
   date: string;
   note?: string;
 }
@@ -28,7 +30,7 @@ export interface UpdateTransactionDto {
   title: string;
   amount: number;
   type: TransactionType;
-  category: string;
+  categoryId: string;
   date: string;
   note?: string;
 }

@@ -2,13 +2,23 @@
 
 import DayTransactions from "@/components/transaction/DayTransactions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency, formatMonth } from "@/lib/format";
 import { transactionApi } from "@/lib/transaction-api";
 import { cn } from "@/lib/utils";
 import { Transaction, TransactionType } from "@/types/transaction";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
+
+/** Extract "YYYY-MM-DD" from a Date using LOCAL time (avoids UTC offset shift) */
+function toLocalDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+const DAY_LABELS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 
 export default function CalendarPage() {
   const today = new Date();
@@ -17,197 +27,171 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [monthTransactions, setMonthTransactions] = useState<Transaction[]>([]);
-  const [dayTransactions, setDayTransactions]     = useState<Transaction[]>([]);
   const [loadingMonth, setLoadingMonth] = useState(true);
-  const [loadingDay, setLoadingDay]     = useState(false);
 
-  // Fetch toàn bộ transactions của tháng
+  // Single fetch per month — derive everything from this
   useEffect(() => {
-    const fetchMonth = async () => {
+    let cancelled = false;
+    const fetch = async () => {
       setLoadingMonth(true);
       try {
         const data = await transactionApi.getByMonth(currentYear, currentMonth);
-        setMonthTransactions(data);
+        if (!cancelled) setMonthTransactions(data);
       } catch (err) {
-        console.error(err);
+        console.error("getByMonth error:", err);
+        if (!cancelled) setMonthTransactions([]);
       } finally {
-        setLoadingMonth(false);
+        if (!cancelled) setLoadingMonth(false);
       }
     };
-    fetchMonth();
+    fetch();
+    return () => { cancelled = true; };
   }, [currentYear, currentMonth]);
 
-  // Fetch transactions của ngày được chọn
-  useEffect(() => {
-    const fetchDay = async () => {
-      setLoadingDay(true);
-      try {
-        const dateStr = selectedDate.toISOString().split("T")[0];
-        const data = await transactionApi.getByDate(dateStr);
-        setDayTransactions(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingDay(false);
-      }
-    };
-    fetchDay();
-  }, [selectedDate]);
-
-  // Navigation
+  // Navigate months — also move selectedDate to 1st of new month
   const prevMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentMonth(12);
-      setCurrentYear((y) => y - 1);
-    } else {
-      setCurrentMonth((m) => m - 1);
-    }
+    const newYear  = currentMonth === 1 ? currentYear - 1 : currentYear;
+    const newMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+    setCurrentYear(newYear);
+    setCurrentMonth(newMonth);
+    setSelectedDate(new Date(newYear, newMonth - 1, 1));
   };
-
   const nextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentMonth(1);
-      setCurrentYear((y) => y + 1);
-    } else {
-      setCurrentMonth((m) => m + 1);
-    }
+    const newYear  = currentMonth === 12 ? currentYear + 1 : currentYear;
+    const newMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+    setCurrentYear(newYear);
+    setCurrentMonth(newMonth);
+    setSelectedDate(new Date(newYear, newMonth - 1, 1));
   };
 
   // Build calendar grid
-  const firstDay  = new Date(currentYear, currentMonth - 1, 1).getDay();
+  const firstDay    = new Date(currentYear, currentMonth - 1, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-  const blanks    = Array(firstDay).fill(null);
-  const days      = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // Map transactions per day
+  // Map per-day summaries — compare date strings directly (no timezone conversion)
   const txByDay: Record<number, { income: number; expense: number }> = {};
   monthTransactions.forEach((t) => {
-    const d = new Date(t.date).getDate();
-    if (!txByDay[d]) txByDay[d] = { income: 0, expense: 0 };
-    if (t.type === TransactionType.Income)  txByDay[d].income  += t.amount;
-    if (t.type === TransactionType.Expense) txByDay[d].expense += t.amount;
+    const dayNum = parseInt(t.date.substring(8, 10), 10); // "YYYY-MM-DD..." → day
+    if (!txByDay[dayNum]) txByDay[dayNum] = { income: 0, expense: 0 };
+    if (t.type === TransactionType.Income)  txByDay[dayNum].income  += t.amount;
+    if (t.type === TransactionType.Expense) txByDay[dayNum].expense += t.amount;
   });
 
+  // Derive day transactions from month data — ensures perfect consistency with dots
+  const selectedDateStr = toLocalDateStr(selectedDate);
+  const dayTransactions = monthTransactions.filter((t) =>
+    t.date.startsWith(selectedDateStr)
+  );
+
   // Monthly summary
-  const monthIncome  = monthTransactions
-    .filter((t) => t.type === TransactionType.Income)
-    .reduce((sum, t) => sum + t.amount, 0);
-  const monthExpense = monthTransactions
-    .filter((t) => t.type === TransactionType.Expense)
-    .reduce((sum, t) => sum + t.amount, 0);
+  const monthIncome  = monthTransactions.filter((t) => t.type === TransactionType.Income) .reduce((s, t) => s + t.amount, 0);
+  const monthExpense = monthTransactions.filter((t) => t.type === TransactionType.Expense).reduce((s, t) => s + t.amount, 0);
+  const monthBalance = monthIncome - monthExpense;
+
+  const isThisMonth =
+    currentYear  === today.getFullYear() &&
+    currentMonth === today.getMonth() + 1;
 
   return (
     <div className="space-y-6">
 
-      {/* Header */}
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold">Calendar</h1>
-        <p className="text-muted-foreground text-sm">
-          View transactions by date
-        </p>
+        <h1 className="text-2xl font-bold">Lịch giao dịch</h1>
+        <p className="text-muted-foreground text-sm">Xem giao dịch theo ngày</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left — Calendar */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* ── Calendar ── */}
+        <div className="lg:col-span-2">
+          <Card className="overflow-hidden">
 
-          {/* Month Navigation */}
-          <Card>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <Button variant="ghost" size="icon" onClick={prevMonth}>
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <div className="text-center">
-                  <CardTitle className="text-lg">
-                    {formatMonth(currentMonth)} {currentYear}
-                  </CardTitle>
-                  <div className="flex gap-4 text-sm mt-1">
-                    <span className="text-green-500">
-                      +{formatCurrency(monthIncome)}
-                    </span>
-                    <span className="text-red-500">
-                      -{formatCurrency(monthExpense)}
+            {/* Month Navigation */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+              <Button variant="ghost" size="icon" onClick={prevMonth} className="h-8 w-8">
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+
+              <div className="text-center">
+                <p className="font-bold text-base">
+                  {formatMonth(currentMonth)} {currentYear}
+                </p>
+                {!loadingMonth && (
+                  <div className="flex items-center gap-3 justify-center mt-0.5 text-xs font-semibold tabular-nums">
+                    <span className="text-green-500">+{formatCurrency(monthIncome)}</span>
+                    <span className="text-muted-foreground/40">|</span>
+                    <span className="text-red-500">−{formatCurrency(monthExpense)}</span>
+                    <span className="text-muted-foreground/40">|</span>
+                    <span className={monthBalance >= 0 ? "text-blue-500" : "text-orange-500"}>
+                      {monthBalance >= 0 ? "+" : "−"}{formatCurrency(Math.abs(monthBalance))}
                     </span>
                   </div>
-                </div>
-                <Button variant="ghost" size="icon" onClick={nextMonth}>
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                )}
               </div>
-            </CardHeader>
 
-            <CardContent>
-              {/* Day Labels */}
-              <div className="grid grid-cols-7 mb-2">
-                {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
-                  <div key={d}
-                    className="text-center text-xs font-medium text-muted-foreground py-1">
+              <Button variant="ghost" size="icon" onClick={nextMonth} className="h-8 w-8">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <CardContent className="p-3">
+              {/* Day labels */}
+              <div className="grid grid-cols-7 mb-1">
+                {DAY_LABELS.map((d) => (
+                  <div key={d} className="text-center text-[11px] font-semibold text-muted-foreground py-1.5">
                     {d}
                   </div>
                 ))}
               </div>
 
-              {/* Calendar Grid */}
+              {/* Grid */}
               {loadingMonth ? (
                 <div className="grid grid-cols-7 gap-1">
                   {Array(35).fill(null).map((_, i) => (
-                    <div key={i}
-                      className="h-14 rounded-lg bg-muted animate-pulse" />
+                    <div key={i} className="h-14 rounded-lg bg-muted animate-pulse" />
                   ))}
                 </div>
               ) : (
                 <div className="grid grid-cols-7 gap-1">
-                  {/* Blank cells */}
-                  {blanks.map((_, i) => (
-                    <div key={`blank-${i}`} className="h-14" />
+                  {Array(firstDay).fill(null).map((_, i) => (
+                    <div key={`b-${i}`} className="h-14" />
                   ))}
 
-                  {/* Day cells */}
-                  {days.map((day) => {
-                    const isToday =
-                      day === today.getDate() &&
-                      currentMonth === today.getMonth() + 1 &&
-                      currentYear === today.getFullYear();
-
+                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
+                    const isToday    = isThisMonth && day === today.getDate();
                     const isSelected =
                       day === selectedDate.getDate() &&
                       currentMonth === selectedDate.getMonth() + 1 &&
-                      currentYear === selectedDate.getFullYear();
-
-                    const hasIncome  = txByDay[day]?.income  > 0;
-                    const hasExpense = txByDay[day]?.expense > 0;
+                      currentYear  === selectedDate.getFullYear();
+                    const hasIncome  = (txByDay[day]?.income  ?? 0) > 0;
+                    const hasExpense = (txByDay[day]?.expense ?? 0) > 0;
+                    const hasAny     = hasIncome || hasExpense;
 
                     return (
-                      <button key={day}
-                        onClick={() =>
-                          setSelectedDate(
-                            new Date(currentYear, currentMonth - 1, day)
-                          )
-                        }
+                      <button
+                        key={day}
+                        onClick={() => setSelectedDate(new Date(currentYear, currentMonth - 1, day))}
                         className={cn(
-                          "h-14 rounded-lg flex flex-col items-center justify-start pt-1.5 text-sm transition-colors relative",
+                          "h-14 rounded-xl flex flex-col items-center justify-start pt-1.5 text-sm transition-all duration-150",
                           isSelected
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-primary text-primary-foreground shadow-md scale-[1.04]"
                             : isToday
-                            ? "bg-accent font-bold"
-                            : "hover:bg-accent/50"
-                        )}>
-                        <span>{day}</span>
-                        {/* Dot indicators */}
-                        <div className="flex gap-0.5 mt-1">
+                            ? "bg-primary/10 text-primary font-bold ring-1 ring-primary/30"
+                            : hasAny
+                            ? "hover:bg-accent/60 font-medium"
+                            : "hover:bg-accent/40 text-muted-foreground"
+                        )}
+                      >
+                        <span className="leading-none">{day}</span>
+                        <div className="flex gap-0.5 mt-1.5">
                           {hasIncome && (
-                            <span className={cn(
-                              "w-1.5 h-1.5 rounded-full bg-green-500",
-                              isSelected && "bg-green-300"
-                            )} />
+                            <span className={cn("w-1.5 h-1.5 rounded-full",
+                              isSelected ? "bg-green-300" : "bg-green-500")} />
                           )}
                           {hasExpense && (
-                            <span className={cn(
-                              "w-1.5 h-1.5 rounded-full bg-red-500",
-                              isSelected && "bg-red-300"
-                            )} />
+                            <span className={cn("w-1.5 h-1.5 rounded-full",
+                              isSelected ? "bg-red-300" : "bg-red-500")} />
                           )}
                         </div>
                       </button>
@@ -215,21 +199,36 @@ export default function CalendarPage() {
                   })}
                 </div>
               )}
+
+              {/* Legend */}
+              <div className="flex items-center gap-4 justify-end mt-3 px-1">
+                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Thu nhập
+                </span>
+                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" /> Chi tiêu
+                </span>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Right — Day Detail */}
+        {/* ── Day Detail ── */}
         <div>
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Day Detail</CardTitle>
-            </CardHeader>
-            <CardContent>
+            <div className="px-5 py-4 border-b border-border/60">
+              <p className="font-semibold text-sm">Chi tiết ngày</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {selectedDate.toLocaleDateString("vi-VN", {
+                  weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
+                })}
+              </p>
+            </div>
+            <CardContent className="pt-4">
               <DayTransactions
                 date={selectedDate}
                 transactions={dayTransactions}
-                loading={loadingDay}
+                loading={loadingMonth}
               />
             </CardContent>
           </Card>
@@ -239,3 +238,4 @@ export default function CalendarPage() {
     </div>
   );
 }
+

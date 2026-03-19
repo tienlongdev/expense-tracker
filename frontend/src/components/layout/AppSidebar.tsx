@@ -3,17 +3,17 @@
 import ThemeToggle from "@/components/layout/ThemeToggle";
 import { cn } from "@/lib/utils";
 import {
-    BookOpen,
-    CalendarDays,
-    ChevronLeft,
-    ChevronRight,
-    CreditCard,
-    LayoutDashboard,
-    List,
-    PiggyBank,
-    Tag,
-    TrendingUp,
-    Wallet,
+  BookOpen,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  LayoutDashboard,
+  List,
+  PiggyBank,
+  Tag,
+  TrendingUp,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,9 +22,9 @@ import NotificationBell from "./NotificationBell";
 
 const navItems = [
   { href: "/",             label: "Dashboard",    icon: LayoutDashboard },
-  { href: "/transactions", label: "Transactions", icon: List },
-  { href: "/calendar",     label: "Calendar",     icon: CalendarDays },
-  { href: "/report",       label: "Report",       icon: TrendingUp },
+  { href: "/transactions", label: "Giao dịch",    icon: List },
+  { href: "/calendar",     label: "Lịch",         icon: CalendarDays },
+  { href: "/report",       label: "Báo cáo",      icon: TrendingUp },
   { href: "/budget",       label: "Ngân sách",    icon: BookOpen },
   { href: "/debt",         label: "Quản lý nợ",   icon: CreditCard },
   { href: "/savings",      label: "Tiết kiệm",    icon: PiggyBank },
@@ -96,7 +96,7 @@ export default function AppSidebar() {
             onClick={() => setMobileOpen(false)}
           >
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
-              <Wallet className="w-4.5 h-4.5 text-primary-foreground" />
+              <Wallet className="w-[18px] h-[18px] text-primary-foreground" />
             </div>
             {!collapsed && (
               <span className="text-sm font-semibold truncate">Expense Tracker</span>
@@ -133,24 +133,23 @@ export default function AppSidebar() {
                 href={href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium",
-                  "transition-colors duration-150 group relative",
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium relative",
+                  "transition-colors duration-150 group",
                   active
                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 )}
               >
-                <Icon
-                  className={cn(
-                    "w-4.5 h-4.5 shrink-0",
-                    active ? "opacity-100" : "opacity-70 group-hover:opacity-100"
-                  )}
-                />
+                {/* Active left accent */}
+                {active && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full bg-primary-foreground opacity-60" />
+                )}
+                <Icon className="w-[18px] h-[18px] shrink-0" />
                 {!collapsed && <span className="truncate">{label}</span>}
 
                 {/* Tooltip when collapsed (desktop) */}
                 {collapsed && (
-                  <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap border border-border">
+                  <div className="hidden lg:block absolute left-full ml-3 px-2.5 py-1.5 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap border border-border z-50">
                     {label}
                   </div>
                 )}

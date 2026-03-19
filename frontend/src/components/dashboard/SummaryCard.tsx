@@ -12,6 +12,24 @@ interface SummaryCardProps {
   loading?: boolean;
 }
 
+const styles = {
+  income: {
+    text:  "text-green-500",
+    bg:    "bg-green-500/10",
+    ring:  "ring-green-500/20",
+    bar:   "bg-green-500",
+    label: "+",
+  },
+  expense: {
+    text:  "text-red-500",
+    bg:    "bg-red-500/10",
+    ring:  "ring-red-500/20",
+    bar:   "bg-red-500",
+    label: "−",
+  },
+  balance: null, // computed dynamically
+} as const;
+
 export default function SummaryCard({
   title,
   amount,
@@ -19,42 +37,50 @@ export default function SummaryCard({
   variant,
   loading = false,
 }: SummaryCardProps) {
-  const colorMap = {
-    income:  "text-green-500",
-    expense: "text-red-500",
-    balance: amount >= 0 ? "text-green-500" : "text-red-500",
-  };
-
-  const bgMap = {
-    income:  "bg-green-50 border-green-100",
-    expense: "bg-red-50 border-red-100",
-    balance: amount >= 0
-      ? "bg-green-50 border-green-100"
-      : "bg-red-50 border-red-100",
-  };
+  const isPositive = amount >= 0;
+  const s = variant === "balance"
+    ? {
+        text:  isPositive ? "text-blue-500" : "text-orange-500",
+        bg:    isPositive ? "bg-blue-500/10" : "bg-orange-500/10",
+        ring:  isPositive ? "ring-blue-500/20" : "ring-orange-500/20",
+        bar:   isPositive ? "bg-blue-500" : "bg-orange-500",
+        label: isPositive ? "+" : "−",
+      }
+    : styles[variant];
 
   if (loading) return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="space-y-3">
-          <div className="h-4 w-24 bg-muted rounded animate-pulse" />
-          <div className="h-8 w-36 bg-muted rounded animate-pulse" />
+    <Card className="overflow-hidden">
+      <CardContent className="p-5">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-muted animate-pulse shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 w-20 rounded bg-muted animate-pulse" />
+            <div className="h-6 w-32 rounded bg-muted animate-pulse" />
+          </div>
         </div>
       </CardContent>
     </Card>
   );
 
   return (
-    <Card className={cn("border", bgMap[variant])}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground font-medium">{title}</p>
-            <p className={cn("text-2xl font-bold mt-1", colorMap[variant])}>
-              {formatCurrency(amount)}
+    <Card className={cn("overflow-hidden ring-1 border-transparent", s.ring)}>
+      {/* Accent top bar */}
+      <div className={cn("h-0.5 w-full", s.bar)} />
+      <CardContent className="p-5">
+        <div className="flex items-center gap-4">
+          {/* Icon */}
+          <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0", s.bg)}>
+            {icon}
+          </div>
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              {title}
+            </p>
+            <p className={cn("text-xl font-bold mt-0.5 tabular-nums", s.text)}>
+              {s.label}{formatCurrency(Math.abs(amount))}
             </p>
           </div>
-          <span className="text-4xl">{icon}</span>
         </div>
       </CardContent>
     </Card>

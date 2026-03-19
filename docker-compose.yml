@@ -16,15 +16,6 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
-    healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd",
-             "-S", "localhost",
-             "-U", "sa",
-             "-P", "YourStrong@Passw0rd",
-             "-Q", "SELECT 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
   # ========================
   # Backend API
@@ -35,7 +26,7 @@ services:
       dockerfile: Dockerfile
     container_name: expense-backend
     ports:
-      - "5000:5000"
+      - "5050:6000"
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       ConnectionStrings__DefaultConnection: >
@@ -45,8 +36,8 @@ services:
         Password=YourStrong@Passw0rd;
         TrustServerCertificate=True;
     depends_on:
-      sqlserver:
-        condition: service_healthy
+      - sqlserver
+    command: ["sh", "-c", "sleep 10 && dotnet ExpenseTracker.API.dll"]
 
   # ========================
   # Frontend
@@ -59,7 +50,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:5000"
+      NEXT_PUBLIC_API_URL: "http://localhost:6000"
     depends_on:
       - backend
 

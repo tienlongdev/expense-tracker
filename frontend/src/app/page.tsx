@@ -43,19 +43,19 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground text-sm">
-            Personal Finance Overview
+            Tổng quan tài chính cá nhân
           </p>
         </div>
 
         {/* Month Selector */}
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={prevMonth}>
+        <div className="flex items-center gap-1.5">
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={prevMonth}>
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <span className="text-sm font-medium w-32 text-center">
+          <span className="text-sm font-semibold tabular-nums w-28 text-center">
             {formatMonth(month)} {year}
           </span>
-          <Button variant="outline" size="icon" onClick={nextMonth}>
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={nextMonth}>
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
@@ -64,21 +64,21 @@ export default function DashboardPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <SummaryCard
-          title="Total Income"
+          title="Tổng thu"
           amount={summary.totalIncome}
           icon="💰"
           variant="income"
           loading={summaryLoading}
         />
         <SummaryCard
-          title="Total Expense"
+          title="Tổng chi"
           amount={summary.totalExpense}
           icon="💸"
           variant="expense"
           loading={summaryLoading}
         />
         <SummaryCard
-          title="Balance"
+          title="Số dư"
           amount={summary.balance}
           icon="🏦"
           variant="balance"

@@ -39,17 +39,22 @@ export default function CategoryForm({
     await onSubmit({ name: name.trim(), type });
   };
 
+  const isIncome = type === TransactionType.Income;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Type */}
-      <div className="space-y-1">
-        <Label>Loại</Label>
+    <form onSubmit={handleSubmit} className="space-y-5">
+
+      {/* Type toggle */}
+      <div className="space-y-1.5">
+        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          Loại danh mục
+        </Label>
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => setType(TransactionType.Income)}
-            className={`py-2 rounded-lg font-medium transition-colors text-sm ${
-              type === TransactionType.Income
+            className={`py-2.5 rounded-lg font-medium transition-colors text-sm ${
+              isIncome
                 ? "bg-green-500 text-white"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
@@ -59,8 +64,8 @@ export default function CategoryForm({
           <button
             type="button"
             onClick={() => setType(TransactionType.Expense)}
-            className={`py-2 rounded-lg font-medium transition-colors text-sm ${
-              type === TransactionType.Expense
+            className={`py-2.5 rounded-lg font-medium transition-colors text-sm ${
+              !isIncome
                 ? "bg-red-500 text-white"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
@@ -71,25 +76,35 @@ export default function CategoryForm({
       </div>
 
       {/* Name */}
-      <div className="space-y-1">
-        <Label htmlFor="cat-name">Tên danh mục</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="cat-name" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          Tên danh mục
+        </Label>
         <Input
           id="cat-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ví dụ: Ăn uống"
+          className={errors.name ? "border-destructive" : ""}
+          autoFocus
         />
         {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
       </div>
 
+      {/* Actions */}
       <div className="flex gap-2 pt-1">
-        <Button type="submit" disabled={loading} className="flex-1">
-          {loading ? "Đang lưu..." : category ? "Cập nhật" : "Thêm danh mục"}
-        </Button>
         <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
           Hủy
+        </Button>
+        <Button
+          type="submit"
+          disabled={loading}
+          className={`flex-1 ${isIncome ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"}`}
+        >
+          {loading ? "Đang lưu..." : category ? "Cập nhật" : "Thêm danh mục"}
         </Button>
       </div>
     </form>
   );
 }
+
