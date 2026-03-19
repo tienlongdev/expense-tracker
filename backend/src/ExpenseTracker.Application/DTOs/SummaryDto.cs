@@ -11,6 +11,7 @@ public class SummaryDto
 // Response DTO — báo cáo theo tháng trong năm
 public class MonthlyReportDto
 {
+    public int Year { get; set; }
     public int Month { get; set; }
     public decimal TotalIncome { get; set; }
     public decimal TotalExpense { get; set; }
