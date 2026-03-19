@@ -3,11 +3,15 @@
 import ThemeToggle from "@/components/layout/ThemeToggle";
 import { cn } from "@/lib/utils";
 import {
+    BookOpen,
     CalendarDays,
     ChevronLeft,
     ChevronRight,
+    CreditCard,
     LayoutDashboard,
     List,
+    PiggyBank,
+    Tag,
     TrendingUp,
     Wallet,
 } from "lucide-react";
@@ -21,6 +25,10 @@ const navItems = [
   { href: "/transactions", label: "Transactions", icon: List },
   { href: "/calendar",     label: "Calendar",     icon: CalendarDays },
   { href: "/report",       label: "Report",       icon: TrendingUp },
+  { href: "/budget",       label: "Ngân sách",    icon: BookOpen },
+  { href: "/debt",         label: "Quản lý nợ",   icon: CreditCard },
+  { href: "/savings",      label: "Tiết kiệm",    icon: PiggyBank },
+  { href: "/category",     label: "Danh mục",     icon: Tag },
 ];
 
 export default function AppSidebar() {

@@ -11,6 +11,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCategories } from "@/hooks/useCategories";
 import {
     CreateTransactionDto,
     Transaction,
@@ -25,16 +26,6 @@ interface TransactionFormProps {
   onCancel: () => void;
   loading?: boolean;
 }
-
-const CATEGORIES = {
-  [TransactionType.Income]: [
-    "Salary", "Freelance", "Investment", "Gift", "Other Income",
-  ],
-  [TransactionType.Expense]: [
-    "Food", "Housing", "Transport", "Utilities",
-    "Healthcare", "Education", "Entertainment", "Shopping", "Other Expense",
-  ],
-};
 
 export default function TransactionForm({
   transaction,
@@ -55,6 +46,8 @@ export default function TransactionForm({
   );
   const [note, setNote]         = useState(transaction?.note ?? "");
   const [errors, setErrors]     = useState<Record<string, string>>({});
+
+  const { categories, loading: catLoading } = useCategories(type);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -129,13 +122,13 @@ export default function TransactionForm({
       {/* Category */}
       <div className="space-y-1">
         <Label>Category</Label>
-        <Select value={category} onValueChange={setCategory}>
+        <Select value={category} onValueChange={setCategory} disabled={catLoading}>
           <SelectTrigger>
-            <SelectValue placeholder="Select category" />
+            <SelectValue placeholder={catLoading ? "Đang tải..." : "Select category"} />
           </SelectTrigger>
           <SelectContent>
-            {CATEGORIES[type].map((cat) => (
-              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
