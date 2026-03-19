@@ -1,4 +1,4 @@
-using ExpenseTracker.Domain.Entities;
+﻿using ExpenseTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Infrastructure.Data;
@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<DebtPayment> DebtPayments => Set<DebtPayment>();
     public DbSet<SavingsAccount> SavingsAccounts => Set<SavingsAccount>();
     public DbSet<SavingsHistory> SavingsHistories => Set<SavingsHistory>();
+    public DbSet<Budget> Budgets => Set<Budget>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -119,13 +120,35 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.Date).IsRequired();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-
-            // Ignore computed property
             entity.Ignore(e => e.ProfitLoss);
 
             entity.HasOne(h => h.SavingsAccount)
                   .WithMany(a => a.History)
                   .HasForeignKey(h => h.SavingsAccountId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================
+        // Budget
+        // ========================
+        modelBuilder.Entity<Budget>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Year).IsRequired();
+            entity.Property(e => e.Month).IsRequired();
+            entity.Property(e => e.PlannedAmount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+            // 1 category chỉ có 1 ngân sách mỗi tháng
+            entity.HasIndex(e => new { e.CategoryId, e.Year, e.Month })
+                  .IsUnique()
+                  .HasDatabaseName("IX_Budget_Category_YearMonth");
+
+            entity.HasOne(b => b.Category)
+                  .WithMany()
+                  .HasForeignKey(b => b.CategoryId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

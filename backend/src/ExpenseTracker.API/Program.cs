@@ -16,8 +16,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure(maxRetryCount: 10,
-            maxRetryDelay: TimeSpan.FromSeconds(15), errorNumbersToAdd: null)
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(15), errorNumbersToAdd: null)
     )
 );
 
@@ -26,12 +26,14 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IDebtRepository, DebtRepository>();
 builder.Services.AddScoped<ISavingsRepository, SavingsRepository>();
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 
 // DI — Services
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDebtService, DebtService>();
 builder.Services.AddScoped<ISavingsService, SavingsService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", p =>
@@ -40,12 +42,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// ========================
+// Auto Migrate + Seed
+// ========================
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    // ── Categories ──────────────────────────────────────────
+    // ── Categories ──────────────────────────────────────────────────────
     if (!db.Categories.Any())
     {
         db.Categories.AddRange(
@@ -76,13 +81,16 @@ using (var scope = app.Services.CreateScope())
                 new Transaction { Id = Guid.NewGuid(), Title = "Tiền nhà tháng 3", Amount = 3_500_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000008"), Date = new DateTime(now.Year, now.Month, 2) },
                 new Transaction { Id = Guid.NewGuid(), Title = "Ăn sáng + trưa", Amount = 250_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000001"), Date = new DateTime(now.Year, now.Month, 5) },
                 new Transaction { Id = Guid.NewGuid(), Title = "Thu nhập freelance", Amount = 5_000_000, Type = TransactionType.Income, CategoryId = new Guid("10000000-0000-0000-0000-000000000002"), Date = new DateTime(now.Year, now.Month, 10) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Mua quần áo", Amount = 800_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000003"), Date = new DateTime(now.Year, now.Month, 12) }
+                new Transaction { Id = Guid.NewGuid(), Title = "Mua quần áo", Amount = 800_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000003"), Date = new DateTime(now.Year, now.Month, 12) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Khám sức khoẻ", Amount = 300_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000006"), Date = new DateTime(now.Year, now.Month, 15) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Điện + nước tháng 3", Amount = 450_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000011"), Date = new DateTime(now.Year, now.Month, 16) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Đi grab + xăng", Amount = 350_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000009"), Date = new DateTime(now.Year, now.Month, 17) }
             );
             db.SaveChanges();
         }
     }
 
-    // ── Debts ────────────────────────────────────────────────
+    // ── Debts ────────────────────────────────────────────────────────────
     if (!db.Debts.Any())
     {
         var now = DateTime.UtcNow;
@@ -93,51 +101,38 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 
-    // ── Savings ──────────────────────────────────────────────
+    // ── Savings ──────────────────────────────────────────────────────────
     if (!db.SavingsAccounts.Any())
     {
         var now = DateTime.UtcNow;
         var savId = Guid.NewGuid();
         var stockId = Guid.NewGuid();
-
         db.SavingsAccounts.AddRange(
-            new SavingsAccount
-            {
-                Id = savId,
-                Name = "Tiết kiệm VCB 6 tháng",
-                Type = SavingsType.Savings,
-                InitialAmount = 50_000_000,
-                TotalDeposited = 50_000_000,
-                CurrentValue = 51_250_000,
-                InterestRate = 5.5m,
-                StartDate = now.AddMonths(-3),
-                MaturityDate = now.AddMonths(3),
-                Status = SavingsStatus.Active,
-                Note = "Gửi kỳ hạn 6 tháng",
-                CreatedAt = now.AddMonths(-3)
-            },
-            new SavingsAccount
-            {
-                Id = stockId,
-                Name = "Danh mục chứng khoán",
-                Type = SavingsType.Stock,
-                InitialAmount = 20_000_000,
-                TotalDeposited = 25_000_000,
-                CurrentValue = 28_500_000,
-                StartDate = now.AddMonths(-6),
-                Status = SavingsStatus.Active,
-                Note = "VNM, FPT, VIC",
-                CreatedAt = now.AddMonths(-6)
-            }
+            new SavingsAccount { Id = savId, Name = "Tiết kiệm VCB 6 tháng", Type = SavingsType.Savings, InitialAmount = 50_000_000, TotalDeposited = 50_000_000, CurrentValue = 51_250_000, InterestRate = 5.5m, StartDate = now.AddMonths(-3), MaturityDate = now.AddMonths(3), Status = SavingsStatus.Active, CreatedAt = now.AddMonths(-3) },
+            new SavingsAccount { Id = stockId, Name = "Danh mục chứng khoán", Type = SavingsType.Stock, InitialAmount = 20_000_000, TotalDeposited = 25_000_000, CurrentValue = 28_500_000, StartDate = now.AddMonths(-6), Status = SavingsStatus.Active, CreatedAt = now.AddMonths(-6) }
         );
         db.SaveChanges();
-
         db.SavingsHistories.AddRange(
             new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = savId, TransactionType = SavingsTransactionType.Deposit, Amount = 50_000_000, PreviousValue = 0, NewValue = 50_000_000, Note = "Nạp vốn ban đầu", Date = now.AddMonths(-3), CreatedAt = now.AddMonths(-3) },
             new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = savId, TransactionType = SavingsTransactionType.InterestReceived, Amount = 1_250_000, PreviousValue = 50_000_000, NewValue = 51_250_000, Note = "Lãi tháng 1", Date = now.AddMonths(-1), CreatedAt = now.AddMonths(-1) },
             new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = stockId, TransactionType = SavingsTransactionType.Deposit, Amount = 20_000_000, PreviousValue = 0, NewValue = 20_000_000, Note = "Nạp vốn ban đầu", Date = now.AddMonths(-6), CreatedAt = now.AddMonths(-6) },
-            new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = stockId, TransactionType = SavingsTransactionType.Deposit, Amount = 5_000_000, PreviousValue = 20_000_000, NewValue = 25_000_000, Note = "Nạp thêm vốn tháng 2", Date = now.AddMonths(-4), CreatedAt = now.AddMonths(-4) },
             new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = stockId, TransactionType = SavingsTransactionType.ValueUpdate, Amount = 0, PreviousValue = 25_000_000, NewValue = 28_500_000, Note = "Tăng 3,500,000đ (+14%)", Date = now.AddDays(-7), CreatedAt = now.AddDays(-7) }
+        );
+        db.SaveChanges();
+    }
+
+    // ── Budgets (tháng hiện tại) ─────────────────────────────────────────
+    if (!db.Budgets.Any())
+    {
+        var now = DateTime.UtcNow;
+        db.Budgets.AddRange(
+            new Budget { Id = Guid.NewGuid(), CategoryId = new Guid("20000000-0000-0000-0000-000000000001"), Year = now.Year, Month = now.Month, PlannedAmount = 2_000_000, Note = "Ăn uống tháng 3", CreatedAt = now },
+            new Budget { Id = Guid.NewGuid(), CategoryId = new Guid("20000000-0000-0000-0000-000000000008"), Year = now.Year, Month = now.Month, PlannedAmount = 4_000_000, Note = "Tiền thuê nhà", CreatedAt = now },
+            new Budget { Id = Guid.NewGuid(), CategoryId = new Guid("20000000-0000-0000-0000-000000000009"), Year = now.Year, Month = now.Month, PlannedAmount = 500_000, Note = "Xăng xe + grab", CreatedAt = now },
+            new Budget { Id = Guid.NewGuid(), CategoryId = new Guid("20000000-0000-0000-0000-000000000011"), Year = now.Year, Month = now.Month, PlannedAmount = 600_000, Note = "Điện nước internet", CreatedAt = now },
+            new Budget { Id = Guid.NewGuid(), CategoryId = new Guid("20000000-0000-0000-0000-000000000003"), Year = now.Year, Month = now.Month, PlannedAmount = 500_000, Note = "Quần áo tháng này", CreatedAt = now },
+            new Budget { Id = Guid.NewGuid(), CategoryId = new Guid("20000000-0000-0000-0000-000000000006"), Year = now.Year, Month = now.Month, PlannedAmount = 500_000, Note = "Khám sức khoẻ định kỳ", CreatedAt = now },
+            new Budget { Id = Guid.NewGuid(), CategoryId = new Guid("20000000-0000-0000-0000-000000000002"), Year = now.Year, Month = now.Month, PlannedAmount = 800_000, Note = "Chi tiêu lặt vặt", CreatedAt = now }
         );
         db.SaveChanges();
     }
