@@ -13,15 +13,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
-// DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 10,
-            maxRetryDelay: TimeSpan.FromSeconds(15),
-            errorNumbersToAdd: null
-        )
+        sqlOptions => sqlOptions.EnableRetryOnFailure(maxRetryCount: 10,
+            maxRetryDelay: TimeSpan.FromSeconds(15), errorNumbersToAdd: null)
     )
 );
 
@@ -29,55 +25,47 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IDebtRepository, DebtRepository>();
+builder.Services.AddScoped<ISavingsRepository, SavingsRepository>();
 
 // DI — Services
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDebtService, DebtService>();
+builder.Services.AddScoped<ISavingsService, SavingsService>();
 
 builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+    options.AddPolicy("AllowFrontend", p =>
+        p.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod())
+);
 
 var app = builder.Build();
 
-// ========================
-// Auto Migrate + Seed
-// ========================
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    // ---- Seed Categories ----
+    // ── Categories ──────────────────────────────────────────
     if (!db.Categories.Any())
     {
-        var categories = new List<Category>
-        {
-            new() { Id = new Guid("10000000-0000-0000-0000-000000000001"), Name = "Lương",              Icon = "💰", Color = "#4CAF50", Type = TransactionType.Income,  IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("10000000-0000-0000-0000-000000000002"), Name = "Thu nhập phụ",       Icon = "💵", Color = "#8BC34A", Type = TransactionType.Income,  IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("10000000-0000-0000-0000-000000000003"), Name = "Đầu tư",             Icon = "📈", Color = "#2196F3", Type = TransactionType.Income,  IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("10000000-0000-0000-0000-000000000004"), Name = "Quà tặng / Thưởng",  Icon = "🎁", Color = "#9C27B0", Type = TransactionType.Income,  IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000001"), Name = "Ăn uống",                Icon = "🍜", Color = "#FF5722", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000002"), Name = "Chi tiêu hàng ngày",     Icon = "🛒", Color = "#FF9800", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000003"), Name = "Quần áo",                Icon = "👗", Color = "#E91E63", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000004"), Name = "Mỹ phẩm",                Icon = "💄", Color = "#F06292", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000005"), Name = "Phí giao lưu",           Icon = "🎉", Color = "#BA68C8", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000006"), Name = "Y tế",                   Icon = "🏥", Color = "#00BCD4", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000007"), Name = "Giáo dục",               Icon = "📚", Color = "#3F51B5", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000008"), Name = "Tiền nhà",               Icon = "🏠", Color = "#795548", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000009"), Name = "Đi lại",                 Icon = "🚗", Color = "#607D8B", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000010"), Name = "Cưới hỏi tiệc tùng",    Icon = "💒", Color = "#FF4081", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+        db.Categories.AddRange(
+            new() { Id = new Guid("10000000-0000-0000-0000-000000000001"), Name = "Lương", Icon = "💰", Color = "#4CAF50", Type = TransactionType.Income, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("10000000-0000-0000-0000-000000000002"), Name = "Thu nhập phụ", Icon = "💵", Color = "#8BC34A", Type = TransactionType.Income, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("10000000-0000-0000-0000-000000000003"), Name = "Đầu tư", Icon = "📈", Color = "#2196F3", Type = TransactionType.Income, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("10000000-0000-0000-0000-000000000004"), Name = "Quà tặng / Thưởng", Icon = "🎁", Color = "#9C27B0", Type = TransactionType.Income, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000001"), Name = "Ăn uống", Icon = "🍜", Color = "#FF5722", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000002"), Name = "Chi tiêu hàng ngày", Icon = "🛒", Color = "#FF9800", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000003"), Name = "Quần áo", Icon = "👗", Color = "#E91E63", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000004"), Name = "Mỹ phẩm", Icon = "💄", Color = "#F06292", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000005"), Name = "Phí giao lưu", Icon = "🎉", Color = "#BA68C8", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000006"), Name = "Y tế", Icon = "🏥", Color = "#00BCD4", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000007"), Name = "Giáo dục", Icon = "📚", Color = "#3F51B5", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000008"), Name = "Tiền nhà", Icon = "🏠", Color = "#795548", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000009"), Name = "Đi lại", Icon = "🚗", Color = "#607D8B", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000010"), Name = "Cưới hỏi tiệc tùng", Icon = "💒", Color = "#FF4081", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
             new() { Id = new Guid("20000000-0000-0000-0000-000000000011"), Name = "Điện / Nước / Internet", Icon = "⚡", Color = "#FFC107", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-            new() { Id = new Guid("20000000-0000-0000-0000-000000000012"), Name = "Giải trí",               Icon = "🎮", Color = "#00E676", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow },
-        };
-        db.Categories.AddRange(categories);
+            new() { Id = new Guid("20000000-0000-0000-0000-000000000012"), Name = "Giải trí", Icon = "🎮", Color = "#00E676", Type = TransactionType.Expense, IsDefault = true, CreatedAt = DateTime.UtcNow }
+        );
         db.SaveChanges();
 
         if (!db.Transactions.Any())
@@ -94,37 +82,62 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // ---- Seed Debts (mẫu) ----
+    // ── Debts ────────────────────────────────────────────────
     if (!db.Debts.Any())
     {
         var now = DateTime.UtcNow;
         db.Debts.AddRange(
-            new Debt
+            new Debt { Id = Guid.NewGuid(), Title = "Vay tiền mua xe máy", PersonName = "Anh Minh", OriginalAmount = 10_000_000, RemainingAmount = 7_000_000, Type = DebtType.Borrowed, Status = DebtStatus.PartiallyPaid, DueDate = now.AddMonths(3), CreatedAt = now },
+            new Debt { Id = Guid.NewGuid(), Title = "Cho bạn mượn đi du lịch", PersonName = "Chị Lan", OriginalAmount = 3_000_000, RemainingAmount = 3_000_000, Type = DebtType.Lent, Status = DebtStatus.Unpaid, DueDate = now.AddMonths(1), CreatedAt = now }
+        );
+        db.SaveChanges();
+    }
+
+    // ── Savings ──────────────────────────────────────────────
+    if (!db.SavingsAccounts.Any())
+    {
+        var now = DateTime.UtcNow;
+        var savId = Guid.NewGuid();
+        var stockId = Guid.NewGuid();
+
+        db.SavingsAccounts.AddRange(
+            new SavingsAccount
             {
-                Id = Guid.NewGuid(),
-                Title = "Vay tiền mua xe máy",
-                PersonName = "Anh Minh",
-                OriginalAmount = 10_000_000,
-                RemainingAmount = 7_000_000,
-                Type = DebtType.Borrowed,
-                Status = DebtStatus.PartiallyPaid,
-                DueDate = now.AddMonths(3),
-                Note = "Trả dần mỗi tháng 1 triệu",
-                CreatedAt = now
+                Id = savId,
+                Name = "Tiết kiệm VCB 6 tháng",
+                Type = SavingsType.Savings,
+                InitialAmount = 50_000_000,
+                TotalDeposited = 50_000_000,
+                CurrentValue = 51_250_000,
+                InterestRate = 5.5m,
+                StartDate = now.AddMonths(-3),
+                MaturityDate = now.AddMonths(3),
+                Status = SavingsStatus.Active,
+                Note = "Gửi kỳ hạn 6 tháng",
+                CreatedAt = now.AddMonths(-3)
             },
-            new Debt
+            new SavingsAccount
             {
-                Id = Guid.NewGuid(),
-                Title = "Cho bạn mượn tiền đi du lịch",
-                PersonName = "Chị Lan",
-                OriginalAmount = 3_000_000,
-                RemainingAmount = 3_000_000,
-                Type = DebtType.Lent,
-                Status = DebtStatus.Unpaid,
-                DueDate = now.AddMonths(1),
-                Note = "Hẹn trả cuối tháng",
-                CreatedAt = now
+                Id = stockId,
+                Name = "Danh mục chứng khoán",
+                Type = SavingsType.Stock,
+                InitialAmount = 20_000_000,
+                TotalDeposited = 25_000_000,
+                CurrentValue = 28_500_000,
+                StartDate = now.AddMonths(-6),
+                Status = SavingsStatus.Active,
+                Note = "VNM, FPT, VIC",
+                CreatedAt = now.AddMonths(-6)
             }
+        );
+        db.SaveChanges();
+
+        db.SavingsHistories.AddRange(
+            new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = savId, TransactionType = SavingsTransactionType.Deposit, Amount = 50_000_000, PreviousValue = 0, NewValue = 50_000_000, Note = "Nạp vốn ban đầu", Date = now.AddMonths(-3), CreatedAt = now.AddMonths(-3) },
+            new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = savId, TransactionType = SavingsTransactionType.InterestReceived, Amount = 1_250_000, PreviousValue = 50_000_000, NewValue = 51_250_000, Note = "Lãi tháng 1", Date = now.AddMonths(-1), CreatedAt = now.AddMonths(-1) },
+            new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = stockId, TransactionType = SavingsTransactionType.Deposit, Amount = 20_000_000, PreviousValue = 0, NewValue = 20_000_000, Note = "Nạp vốn ban đầu", Date = now.AddMonths(-6), CreatedAt = now.AddMonths(-6) },
+            new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = stockId, TransactionType = SavingsTransactionType.Deposit, Amount = 5_000_000, PreviousValue = 20_000_000, NewValue = 25_000_000, Note = "Nạp thêm vốn tháng 2", Date = now.AddMonths(-4), CreatedAt = now.AddMonths(-4) },
+            new SavingsHistory { Id = Guid.NewGuid(), SavingsAccountId = stockId, TransactionType = SavingsTransactionType.ValueUpdate, Amount = 0, PreviousValue = 25_000_000, NewValue = 28_500_000, Note = "Tăng 3,500,000đ (+14%)", Date = now.AddDays(-7), CreatedAt = now.AddDays(-7) }
         );
         db.SaveChanges();
     }
