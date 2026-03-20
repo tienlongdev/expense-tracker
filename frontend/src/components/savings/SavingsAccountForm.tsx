@@ -5,11 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  CreateSavingsAccountDto,
-  SAVINGS_TYPE_LABELS,
-  SavingsAccount,
-  SavingsType,
-  UpdateSavingsAccountDto,
+    CreateSavingsAccountDto,
+    SAVINGS_TYPE_LABELS,
+    SavingsAccount,
+    SavingsType,
+    UpdateSavingsAccountDto,
 } from "@/types/savings";
 import { useState } from "react";
 
@@ -52,7 +52,7 @@ export default function SavingsAccountForm({
   const [name, setName]               = useState(account?.name ?? "");
   const [type, setType]               = useState<SavingsType>(account?.type ?? SavingsType.Savings);
   const [principalDisplay, setPrincipal] = useState(
-    account?.principalAmount ? formatThousands(account.principalAmount.toString()) : ""
+    account?.totalDeposited ? formatThousands(account.totalDeposited.toString()) : ""
   );
   const [interestRate, setInterest]   = useState(account?.interestRate?.toString() ?? "");
   const [startDate, setStartDate]     = useState(
@@ -89,7 +89,7 @@ export default function SavingsAccountForm({
       await onSubmit({
         name: name.trim(),
         type,
-        principalAmount: parseAmount(principalDisplay),
+        initialAmount: parseAmount(principalDisplay),
         interestRate: interestRate ? Number(interestRate) : undefined,
         startDate: new Date(startDate).toISOString(),
         maturityDate: maturityDate ? new Date(maturityDate).toISOString() : undefined,
