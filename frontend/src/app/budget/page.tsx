@@ -143,11 +143,11 @@ export default function BudgetPage() {
             </div>
           </div>
           <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
-            <div className={`h-0.5 ${overview.totalActual > overview.totalPlanned ? "bg-red-500" : "bg-orange-400"}`} />
+            <div className={`h-0.5 ${overview.totalSpent > overview.totalPlanned ? "bg-red-500" : "bg-orange-400"}`} />
             <div className="p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Đã chi</p>
-              <p className={`text-lg font-bold tabular-nums mt-0.5 ${overview.totalActual > overview.totalPlanned ? "text-red-500" : "text-foreground"}`}>
-                {formatCurrency(overview.totalActual)}
+              <p className={`text-lg font-bold tabular-nums mt-0.5 ${overview.totalSpent > overview.totalPlanned ? "text-red-500" : "text-foreground"}`}>
+                {formatCurrency(overview.totalSpent)}
               </p>
             </div>
           </div>
@@ -168,7 +168,15 @@ export default function BudgetPage() {
       )}
 
       <BudgetList
-        budgets={budgets}
+        budgets={budgets.map(b => {
+          const status = overview?.categories.find(c => c.categoryId === b.categoryId);
+          return {
+            ...b,
+            actualAmount:    status?.spentAmount    ?? 0,
+            percentUsed:     status?.usedPercent    ?? 0,
+            remainingAmount: status?.remainingAmount ?? b.plannedAmount,
+          };
+        })}
         loading={loading}
         onEdit={openEdit}
         onDelete={handleDelete}

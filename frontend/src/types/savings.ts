@@ -37,7 +37,7 @@ export interface SavingsAccount {
   typeName: string;
   status: SavingsStatus;
   statusName: string;
-  principalAmount: number;
+  totalDeposited: number;
   currentValue: number;
   profitLoss: number;
   interestRate?: number;
@@ -50,7 +50,7 @@ export interface SavingsAccount {
 export interface CreateSavingsAccountDto {
   name: string;
   type: SavingsType;
-  principalAmount: number;
+  initialAmount: number;
   interestRate?: number;
   startDate: string;
   maturityDate?: string;
@@ -68,10 +68,12 @@ export interface UpdateSavingsAccountDto {
 export interface SavingsHistoryDto {
   id: string;
   savingsAccountId: string;
-  transactionType: string;
+  transactionType: number;
+  transactionTypeName: string;
   amount: number;
-  currentValueAfter: number;
-  profitLossAfter: number;
+  previousValue: number;
+  newValue: number;
+  profitLoss: number;
   note?: string;
   date: string;
 }
@@ -105,10 +107,11 @@ export interface CloseAccountDto {
 }
 
 export interface SavingsSummary {
-  totalPrincipal: number;
+  totalDeposited: number;
   totalCurrentValue: number;
   totalProfitLoss: number;
-  profitLossPercentage: number;
+  totalProfitPercent: number;
   activeCount: number;
-  totalCount: number;
+  maturedCount: number;
+  closedCount: number;
 }

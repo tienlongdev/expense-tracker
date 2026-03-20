@@ -21,13 +21,33 @@ export interface UpdateBudgetDto {
   plannedAmount: number;
 }
 
+export interface BudgetStatusItem {
+  categoryId: string;
+  categoryName: string;
+  categoryIcon?: string;
+  categoryColor?: string;
+  budgetId?: string;
+  plannedAmount: number;
+  spentAmount: number;
+  remainingAmount: number;
+  usedPercent: number;
+  isOverBudget: boolean;
+  isNearLimit: boolean;
+  isNoBudget: boolean;
+}
+
 export interface BudgetOverview {
   year: number;
   month: number;
   totalPlanned: number;
-  totalActual: number;
+  totalSpent: number;
   totalRemaining: number;
-  items: Budget[];
+  usedPercent: number;
+  overBudgetCount: number;
+  nearLimitCount: number;
+  onTrackCount: number;
+  noBudgetCount: number;
+  categories: BudgetStatusItem[];
 }
 
 export interface BudgetYearlyOverview {
@@ -38,8 +58,10 @@ export interface BudgetYearlyOverview {
 export interface BudgetMonthSummary {
   month: number;
   totalPlanned: number;
-  totalActual: number;
+  totalSpent: number;
   totalRemaining: number;
+  budgetCount: number;
+  overBudgetCount: number;
 }
 
 export interface BulkUpsertBudgetItemDto {

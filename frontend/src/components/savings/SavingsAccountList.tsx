@@ -3,19 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDate } from "@/lib/format";
 import {
-  SAVINGS_STATUS_LABELS,
-  SAVINGS_TYPE_LABELS,
-  SavingsAccount,
-  SavingsStatus,
+    SAVINGS_STATUS_LABELS,
+    SAVINGS_TYPE_LABELS,
+    SavingsAccount,
+    SavingsStatus,
 } from "@/types/savings";
 import {
-  ArrowDownCircle,
-  ArrowUpCircle,
-  History,
-  Pencil,
-  RefreshCw,
-  Trash2,
-  X,
+    ArrowDownCircle,
+    ArrowUpCircle,
+    History,
+    Pencil,
+    RefreshCw,
+    Trash2,
+    X,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -105,8 +105,8 @@ export default function SavingsAccountList({
         const isProfit  = acc.profitLoss >= 0;
         const plColor   = isProfit ? "text-green-500" : "text-red-500";
         const plPrefix  = isProfit ? "+" : "−";
-        const plPct     = acc.principalAmount > 0
-          ? ((Math.abs(acc.profitLoss) / acc.principalAmount) * 100).toFixed(1)
+        const plPct     = acc.totalDeposited > 0
+          ? ((Math.abs(acc.profitLoss) / acc.totalDeposited) * 100).toFixed(1)
           : null;
 
         return (
@@ -145,16 +145,16 @@ export default function SavingsAccountList({
               </div>
 
               {/* Progress bar */}
-              {acc.principalAmount > 0 && (
+              {acc.totalDeposited > 0 && (
                 <div className="space-y-1">
                   <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${isProfit ? "bg-green-500" : "bg-red-500"}`}
-                      style={{ width: `${Math.min(Math.abs((acc.profitLoss / acc.principalAmount) * 100), 100)}%` }}
+                      style={{ width: `${Math.min(Math.abs((acc.profitLoss / acc.totalDeposited) * 100), 100)}%` }}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground tabular-nums">
-                    Vốn: {formatCurrency(acc.principalAmount)}
+                    Vốn: {formatCurrency(acc.totalDeposited)}
                   </p>
                 </div>
               )}
