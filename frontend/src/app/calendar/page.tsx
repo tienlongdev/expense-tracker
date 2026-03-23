@@ -139,7 +139,7 @@ export default function CalendarPage() {
               {/* Day labels */}
               <div className="grid grid-cols-7 mb-1">
                 {DAY_LABELS.map((d) => (
-                  <div key={d} className="text-center text-[11px] font-semibold text-muted-foreground py-1.5">
+                  <div key={d} className="text-center text-xs font-bold text-muted-foreground uppercase tracking-wider py-2">
                     {d}
                   </div>
                 ))}
@@ -173,25 +173,31 @@ export default function CalendarPage() {
                         key={day}
                         onClick={() => setSelectedDate(new Date(currentYear, currentMonth - 1, day))}
                         className={cn(
-                          "h-14 rounded-xl flex flex-col items-center justify-start pt-1.5 text-sm transition-all duration-150",
-                          isSelected
-                            ? "bg-primary text-primary-foreground shadow-md scale-[1.04]"
-                            : isToday
-                            ? "bg-primary/10 text-primary font-bold ring-1 ring-primary/30"
-                            : hasAny
-                            ? "hover:bg-accent/60 font-medium"
-                            : "hover:bg-accent/40 text-muted-foreground"
+                          "h-14 rounded-2xl flex flex-col items-center justify-start pt-1.5 text-sm transition-all duration-150 group",
+                          !isSelected && hasAny && "hover:bg-accent/40",
+                          !isSelected && !hasAny && "hover:bg-accent/20"
                         )}
                       >
-                        <span className="leading-none">{day}</span>
-                        <div className="flex gap-0.5 mt-1.5">
+                        <span 
+                          className={cn(
+                            "w-8 h-8 flex items-center justify-center rounded-full transition-all text-[13px] sm:text-sm",
+                            isSelected
+                              ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 font-bold scale-110"
+                              : isToday
+                              ? "bg-primary/10 text-primary font-bold"
+                              : "text-foreground font-medium group-hover:text-primary"
+                          )}
+                        >
+                          {day}
+                        </span>
+                        
+                        {/* Dots */}
+                        <div className="flex gap-1 mt-1 transition-opacity">
                           {hasIncome && (
-                            <span className={cn("w-1.5 h-1.5 rounded-full",
-                              isSelected ? "bg-green-300" : "bg-green-500")} />
+                            <span className={cn("w-1 h-1 rounded-full bg-emerald-500", !isSelected && "shadow-sm shadow-emerald-500/20")} />
                           )}
                           {hasExpense && (
-                            <span className={cn("w-1.5 h-1.5 rounded-full",
-                              isSelected ? "bg-red-300" : "bg-red-500")} />
+                            <span className={cn("w-1 h-1 rounded-full bg-rose-500", !isSelected && "shadow-sm shadow-rose-500/20")} />
                           )}
                         </div>
                       </button>
@@ -202,11 +208,11 @@ export default function CalendarPage() {
 
               {/* Legend */}
               <div className="flex items-center gap-4 justify-end mt-3 px-1">
-                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> Thu nhập
+                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/30 inline-block" /> Thu nhập
                 </span>
-                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" /> Chi tiêu
+                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 shadow-sm shadow-rose-500/30 inline-block" /> Chi tiêu
                 </span>
               </div>
             </CardContent>

@@ -2,6 +2,7 @@
 
 import { formatCurrency, formatDate } from "@/lib/format";
 import { Transaction, TransactionType } from "@/types/transaction";
+import Icon from "@/components/ui/Icon";
 
 interface DayTransactionsProps {
   date: Date;
@@ -57,9 +58,11 @@ export default function DayTransactions({
 
       {/* Transactions */}
       {transactions.length === 0 ? (
-        <div className="flex flex-col items-center py-8 text-muted-foreground">
-          <p className="text-2xl mb-2">📅</p>
-          <p className="text-sm">Không có giao dịch trong ngày này</p>
+        <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3">
+          <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
+            <Icon name="calendar" className="w-7 h-7 text-muted-foreground/40" />
+          </div>
+          <p className="text-sm font-medium text-foreground/50">Không có giao dịch nào</p>
         </div>
       ) : (
         <div className="space-y-1.5">

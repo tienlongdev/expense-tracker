@@ -93,13 +93,9 @@ export default function DebtList({ debts, loading, onEdit, onDelete, onPay }: De
         return (
           <div
             key={debt.id}
-            className="group rounded-2xl overflow-hidden ring-1 ring-border/40 bg-card hover:ring-border hover:shadow-md shadow-sm transition-all duration-200"
+            className="group rounded-2xl ring-1 ring-border/40 bg-card hover:ring-border hover:shadow-md shadow-sm transition-all duration-200 p-4 sm:p-5 space-y-4"
           >
-            {/* Accent bar */}
-            <div className={`h-0.5 ${styles.accent}`} />
-
-            <div className="p-4 space-y-3">
-              {/* ── Top row ── */}
+            {/* ── Top row ── */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
 
@@ -226,7 +222,6 @@ export default function DebtList({ debts, loading, onEdit, onDelete, onPay }: De
                   )}
                 </div>
               </div>
-            </div>
           </div>
         );
       })}
