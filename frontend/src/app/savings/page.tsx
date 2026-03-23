@@ -5,22 +5,22 @@ import SavingsAccountList from "@/components/savings/SavingsAccountList";
 import SavingsTransactionForm, { SavingsTxType } from "@/components/savings/SavingsTransactionForm";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { useSavings } from "@/hooks/useSavings";
 import { formatCurrency } from "@/lib/format";
 import { savingsApi } from "@/lib/savings-api";
 import {
-  CreateSavingsAccountDto,
-  SavingsAccount,
-  SavingsHistoryDto,
-  SavingsStatus,
-  UpdateSavingsAccountDto,
+    CreateSavingsAccountDto,
+    SavingsAccount,
+    SavingsHistoryDto,
+    SavingsStatus,
+    UpdateSavingsAccountDto,
 } from "@/types/savings";
-import { Plus } from "lucide-react";
+import Icon from "@/components/ui/Icon";
 import { useState } from "react";
 
 export default function SavingsPage() {
@@ -148,11 +148,11 @@ export default function SavingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Tiết kiệm & Đầu tư</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Tiết kiệm & Đầu tư</h1>
           <p className="text-sm text-muted-foreground mt-1">{accounts.length} tài khoản</p>
         </div>
         <Button onClick={openCreate} size="sm">
-          <Plus className="w-4 h-4 mr-1" />
+          <Icon name="plus" className="w-4 h-4 mr-1" />
           Thêm tài khoản
         </Button>
       </div>
@@ -160,21 +160,21 @@ export default function SavingsPage() {
       {/* Summary */}
       {summary && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
             <div className="h-0.5 bg-blue-500" />
             <div className="p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tổng vốn</p>
               <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(summary.totalPrincipal)}</p>
             </div>
           </div>
-          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
             <div className="h-0.5 bg-indigo-500" />
             <div className="p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Giá trị hiện tại</p>
               <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(summary.totalCurrentValue)}</p>
             </div>
           </div>
-          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
             <div className={`h-0.5 ${summary.totalProfitLoss >= 0 ? "bg-green-500" : "bg-red-500"}`} />
             <div className="p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Lời / Lỗ</p>
@@ -186,7 +186,7 @@ export default function SavingsPage() {
               </p>
             </div>
           </div>
-          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+          <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
             <div className="h-0.5 bg-emerald-500" />
             <div className="p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Đang hoạt động</p>

@@ -7,7 +7,7 @@ import { formatCurrency, formatMonth } from "@/lib/format";
 import { transactionApi } from "@/lib/transaction-api";
 import { cn } from "@/lib/utils";
 import { Transaction, TransactionType } from "@/types/transaction";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import Icon from "@/components/ui/Icon";
 import { useEffect, useState } from "react";
 
 /** Extract "YYYY-MM-DD" from a Date using LOCAL time (avoids UTC offset shift) */
@@ -97,8 +97,8 @@ export default function CalendarPage() {
 
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold">Lịch giao dịch</h1>
-        <p className="text-muted-foreground text-sm">Xem giao dịch theo ngày</p>
+        <h1 className="text-xl font-semibold tracking-tight">Lịch giao dịch</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">Xem giao dịch theo ngày</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -110,7 +110,7 @@ export default function CalendarPage() {
             {/* Month Navigation */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
               <Button variant="ghost" size="icon" onClick={prevMonth} className="h-8 w-8">
-                <ChevronLeft className="w-4 h-4" />
+                <Icon name="chevron-left" className="w-4 h-4" />
               </Button>
 
               <div className="text-center">
@@ -131,7 +131,7 @@ export default function CalendarPage() {
               </div>
 
               <Button variant="ghost" size="icon" onClick={nextMonth} className="h-8 w-8">
-                <ChevronRight className="w-4 h-4" />
+                <Icon name="chevron-right" className="w-4 h-4" />
               </Button>
             </div>
 

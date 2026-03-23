@@ -47,3 +47,20 @@ export interface MonthlyReportDto {
   totalExpense: number;
   balance: number;
 }
+
+export interface TransactionQueryParams {
+  page: number;
+  pageSize: number;
+  fromDate?: string;
+  toDate?: string;
+  type?: TransactionType;
+  title?: string;
+}
+
+export interface PagedTransactionResult {
+  items: Transaction[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}

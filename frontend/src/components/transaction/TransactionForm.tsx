@@ -4,19 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCategories } from "@/hooks/useCategories";
 import {
-  CreateTransactionDto,
-  Transaction,
-  TransactionType,
-  UpdateTransactionDto,
+    CreateTransactionDto,
+    Transaction,
+    TransactionType,
+    UpdateTransactionDto,
 } from "@/types/transaction";
 import { useState } from "react";
 
@@ -98,7 +98,7 @@ export default function TransactionForm({
     <form onSubmit={handleSubmit} className="space-y-5">
 
       {/* Type Toggle */}
-      <div className="flex rounded-xl overflow-hidden border border-border p-1 gap-1 bg-muted/40">
+      <div className="flex rounded-xl overflow-hidden border border-border p-1 gap-1 bg-muted/30">
         <button
           type="button"
           onClick={() => { setType(TransactionType.Income); setCategoryId(""); }}
@@ -122,10 +122,10 @@ export default function TransactionForm({
       </div>
 
       {/* Amount — prominent */}
-      <div className={`rounded-xl border-2 px-4 py-3 bg-muted/30 transition-colors
+      <div className={`rounded-xl border-2 px-4 py-3 bg-background/50 transition-all duration-200
         ${errors.amount
           ? "border-destructive"
-          : isExpense ? "border-red-500/40 focus-within:border-red-500" : "border-green-500/40 focus-within:border-green-500"}`}>
+          : isExpense ? "border-red-500/40 focus-within:border-red-500 focus-within:bg-red-500/5" : "border-green-500/40 focus-within:border-green-500 focus-within:bg-green-500/5"}`}>
         <p className="text-xs text-muted-foreground mb-1 font-medium">Số tiền (VND)</p>
         <div className="flex items-center gap-2">
           <span className={`text-lg font-bold ${isExpense ? "text-red-500" : "text-green-500"}`}>

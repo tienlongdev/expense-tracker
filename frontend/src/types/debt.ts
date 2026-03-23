@@ -21,7 +21,7 @@ export interface Debt {
   id: string;
   title: string;
   personName: string;
-  amount: number;
+  originalAmount: number;  // backend: OriginalAmount (camelCase: originalAmount)
   remainingAmount: number;
   paidAmount: number;
   type: DebtType;
@@ -36,24 +36,22 @@ export interface Debt {
 export interface CreateDebtDto {
   title: string;
   personName: string;
-  amount: number;
+  originalAmount: number;  // backend field name: OriginalAmount
   type: DebtType;
   dueDate?: string;
   note?: string;
 }
 
 export interface UpdateDebtDto {
-  title: string;
-  personName: string;
-  amount: number;
-  type: DebtType;
+  title?: string;
+  personName?: string;
   dueDate?: string;
   note?: string;
 }
 
 export interface CreateDebtPaymentDto {
   amount: number;
-  date: string;
+  paidDate: string;  // backend field name: PaidDate
   note?: string;
 }
 

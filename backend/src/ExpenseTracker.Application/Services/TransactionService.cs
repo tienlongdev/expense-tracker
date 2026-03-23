@@ -19,10 +19,27 @@ public class TransactionService : ITransactionService
     // CRUD
     // ========================
 
-    public async Task<IEnumerable<TransactionDto>> GetAllAsync()
+    public async Task<PagedResultDto<TransactionDto>> GetPagedAsync(TransactionQueryDto query)
     {
-        var transactions = await _repository.GetAllAsync();
-        return transactions.Select(MapToDto);
+        var page = query.Page < 1 ? 1 : query.Page;
+        var pageSize = query.PageSize < 1 ? 20 : query.PageSize;
+
+        var (items, totalCount) = await _repository.GetPagedAsync(
+            page,
+            pageSize,
+            query.FromDate,
+            query.ToDate,
+            query.Type,
+            query.Title
+        );
+
+        return new PagedResultDto<TransactionDto>
+        {
+            Items = items.Select(MapToDto).ToList(),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public async Task<TransactionDto?> GetByIdAsync(Guid id)
@@ -124,7 +141,7 @@ public class TransactionService : ITransactionService
         {
             var income = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Income, year, m);
             var expense = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Expense, year, m);
-            report.Add(new MonthlyReportDto { Month = m, Year = year, TotalIncome = income, TotalExpense = expense   });
+            report.Add(new MonthlyReportDto { Month = m, Year = year, TotalIncome = income, TotalExpense = expense });
         }
         return report;
     }

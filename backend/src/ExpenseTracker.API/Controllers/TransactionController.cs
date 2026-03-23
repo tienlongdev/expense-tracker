@@ -19,11 +19,20 @@ public class TransactionController : ControllerBase
     // CRUD
     // ========================
 
-    // GET api/transaction
+    // GET api/transaction?page=1&pageSize=20&fromDate=2026-03-01&toDate=2026-03-31&type=2&title=an
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetPaged([FromQuery] TransactionQueryDto query)
     {
-        var result = await _service.GetAllAsync();
+        if (query.Page < 1)
+            return BadRequest(new { message = "Page must be greater than or equal to 1" });
+
+        if (query.PageSize < 1 || query.PageSize > 100)
+            return BadRequest(new { message = "PageSize must be between 1 and 100" });
+
+        if (query.FromDate.HasValue && query.ToDate.HasValue && query.FromDate > query.ToDate)
+            return BadRequest(new { message = "FromDate must be less than or equal to ToDate" });
+
+        var result = await _service.GetPagedAsync(query);
         return Ok(result);
     }
 

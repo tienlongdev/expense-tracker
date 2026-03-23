@@ -55,9 +55,9 @@ export default function PaymentForm({
     ev.preventDefault();
     if (!validate()) return;
     await onSubmit({
-      amount: parseAmount(amountDisplay),
-      date:   new Date(date).toISOString(),
-      note:   note.trim() || undefined,
+      amount:   parseAmount(amountDisplay),
+      paidDate: new Date(date).toISOString(),
+      note:     note.trim() || undefined,
     });
   };
 

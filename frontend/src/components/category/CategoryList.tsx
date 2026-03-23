@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/Icon";
 import { Category } from "@/types/category";
 import { TransactionType } from "@/types/transaction";
-import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface CategoryListProps {
@@ -15,7 +15,7 @@ interface CategoryListProps {
 
 function SkeletonItem() {
   return (
-    <div className="flex items-center justify-between px-4 py-3 rounded-lg ring-1 ring-border/60 border-transparent bg-card animate-pulse">
+    <div className="flex items-center justify-between px-4 py-3 rounded-lg ring-1 ring-border/40 border-transparent bg-card shadow-sm animate-pulse">
       <div className="flex items-center gap-3">
         <div className="w-2.5 h-2.5 rounded-full bg-muted" />
         <div className="h-3.5 w-28 bg-muted rounded" />
@@ -72,7 +72,7 @@ export default function CategoryList({
         {list.map((cat) => (
           <div
             key={cat.id}
-            className="group flex items-center justify-between px-4 py-2.5 rounded-lg ring-1 ring-border/60 border-transparent bg-card"
+            className="group flex items-center justify-between px-4 py-2.5 rounded-lg ring-1 ring-border/40 border-transparent bg-card shadow-sm"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${dotColor}`} />
@@ -82,36 +82,20 @@ export default function CategoryList({
             <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {confirmId === cat.id ? (
                 <>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    className="h-6 px-2 text-xs"
-                    disabled={deletingId === cat.id}
-                    onClick={() => handleDelete(cat.id)}
-                  >
+                  <Button size="sm" variant="destructive" className="h-6 px-2 text-xs" disabled={deletingId === cat.id} onClick={() => handleDelete(cat.id)}>
                     {deletingId === cat.id ? "..." : "Xóa"}
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-6 px-2 text-xs"
-                    onClick={() => setConfirmId(null)}
-                  >
+                  <Button size="sm" variant="outline" className="h-6 px-2 text-xs" onClick={() => setConfirmId(null)}>
                     Hủy
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => onEdit(cat)}>
-                    <Pencil className="w-3.5 h-3.5" />
+                  <Button size="icon" variant="ghost" className="h-6 w-6 hover:scale-110 transition-transform" onClick={() => onEdit(cat)}>
+                    <Icon name="pencil" className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
                   </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-6 w-6 text-destructive hover:text-destructive"
-                    onClick={() => setConfirmId(cat.id)}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
+                  <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:text-destructive hover:scale-110 transition-transform" onClick={() => setConfirmId(cat.id)}>
+                    <Icon name="trash" className="w-3.5 h-3.5" />
                   </Button>
                 </>
               )}
@@ -128,4 +112,3 @@ export default function CategoryList({
     </div>
   );
 }
-

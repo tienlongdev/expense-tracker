@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/Icon";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,7 +34,7 @@ export default function DebtForm({ debt, onSubmit, onCancel, loading = false }: 
   const [title, setTitle]           = useState(debt?.title ?? "");
   const [personName, setPersonName] = useState(debt?.personName ?? "");
   const [amountDisplay, setAmountDisplay] = useState(
-    debt?.amount ? formatThousands(debt.amount.toString()) : ""
+    debt?.originalAmount ? formatThousands(debt.originalAmount.toString()) : ""
   );
   const [type, setType]     = useState<DebtType>(debt?.type ?? DebtType.Borrowed);
   const [dueDate, setDueDate] = useState(
@@ -54,14 +55,28 @@ export default function DebtForm({ debt, onSubmit, onCancel, loading = false }: 
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!validate()) return;
-    await onSubmit({
-      title:      title.trim(),
-      personName: personName.trim(),
-      amount:     parseAmount(amountDisplay),
-      type,
-      dueDate:    dueDate ? new Date(dueDate).toISOString() : undefined,
-      note:       note.trim() || undefined,
-    });
+
+    if (debt) {
+      // Update: only title, personName, dueDate, note
+      const updateDto: UpdateDebtDto = {
+        title:      title.trim(),
+        personName: personName.trim(),
+        dueDate:    dueDate ? new Date(dueDate).toISOString() : undefined,
+        note:       note.trim() || undefined,
+      };
+      await onSubmit(updateDto);
+    } else {
+      // Create: include originalAmount and type
+      const createDto: CreateDebtDto = {
+        title:          title.trim(),
+        personName:     personName.trim(),
+        originalAmount: parseAmount(amountDisplay),
+        type,
+        dueDate:        dueDate ? new Date(dueDate).toISOString() : undefined,
+        note:           note.trim() || undefined,
+      };
+      await onSubmit(createDto);
+    }
   };
 
   const isBorrowed = type === DebtType.Borrowed;
@@ -74,24 +89,26 @@ export default function DebtForm({ debt, onSubmit, onCancel, loading = false }: 
         <button
           type="button"
           onClick={() => setType(DebtType.Borrowed)}
-          className={`py-2 rounded-lg font-medium text-sm transition-colors ${
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${
             isBorrowed
-              ? "bg-red-500 text-white"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-gradient-to-r from-rose-500 to-rose-600 text-white shadow-sm shadow-rose-500/25"
+              : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
           }`}
         >
-          📥 Tôi đang vay
+          <Icon name="arrow-down" variant={isBorrowed ? "solid" : "outline"} className="w-4 h-4" />
+          Tôi đang vay
         </button>
         <button
           type="button"
           onClick={() => setType(DebtType.Lent)}
-          className={`py-2 rounded-lg font-medium text-sm transition-colors ${
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-sm transition-all duration-150 ${
             !isBorrowed
-              ? "bg-blue-500 text-white"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm shadow-blue-500/25"
+              : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
           }`}
         >
-          📤 Tôi cho mượn
+          <Icon name="arrow-up" variant={!isBorrowed ? "solid" : "outline"} className="w-4 h-4" />
+          Tôi cho mượn
         </button>
       </div>
 

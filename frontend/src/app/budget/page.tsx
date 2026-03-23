@@ -4,17 +4,18 @@ import BudgetForm from "@/components/budget/BudgetForm";
 import BudgetList from "@/components/budget/BudgetList";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { useBudget } from "@/hooks/useBudget";
 import { useCategories } from "@/hooks/useCategories";
 import { formatCurrency } from "@/lib/format";
 import { Budget, CopyBudgetDto, CreateBudgetDto, UpdateBudgetDto } from "@/types/budget";
 import { TransactionType } from "@/types/transaction";
-import { ChevronLeft, ChevronRight, Copy, Plus } from "lucide-react";
+import Icon from "@/components/ui/Icon";
+import { SummaryCard } from "@/components/ui/SummaryCard";
 import { useState } from "react";
 
 export default function BudgetPage() {
@@ -24,6 +25,7 @@ export default function BudgetPage() {
 
   const {
     budgets,
+    records,
     overview,
     loading,
     error,
@@ -59,7 +61,9 @@ export default function BudgetPage() {
       setMutating(true);
       setMutError(null);
       if (editing) {
-        await updateBudget(editing.id, dto as UpdateBudgetDto);
+        // editing is a Budget (BudgetStatusDto), find its record id via budgetId
+        const id = editing.budgetId!;
+        await updateBudget(id, dto as UpdateBudgetDto);
       } else {
         await createBudget(dto as CreateBudgetDto);
       }
@@ -75,6 +79,7 @@ export default function BudgetPage() {
     try { await deleteBudget(id); }
     catch (err) { alert(err instanceof Error ? err.message : "Không thể xóa ngân sách"); }
   };
+
 
   const handleCopy = async () => {
     try {
@@ -103,30 +108,30 @@ export default function BudgetPage() {
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Ngân sách</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="text-xl font-semibold tracking-tight">Ngân sách</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Tháng {month}/{year}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {/* Month navigation */}
-          <div className="flex items-center gap-1 bg-muted rounded-lg px-1">
+          <div className="flex items-center gap-1 bg-card border border-border rounded-xl px-1 py-1">
             <Button size="icon" className="h-7 w-7" variant="ghost" onClick={() => navMonth(-1)}>
-              <ChevronLeft className="w-4 h-4" />
+              <Icon name="chevron-left" className="w-4 h-4" />
             </Button>
             <span className="text-sm font-medium px-2 min-w-[80px] text-center">
               {MONTHS[month - 1]} {year}
             </span>
             <Button size="icon" className="h-7 w-7" variant="ghost" onClick={() => navMonth(1)}>
-              <ChevronRight className="w-4 h-4" />
+              <Icon name="chevron-right" className="w-4 h-4" />
             </Button>
           </div>
           <Button size="sm" variant="outline" onClick={() => setCopyDialog(true)}>
-            <Copy className="w-4 h-4 mr-1" />
+            <Icon name="copy" className="w-4 h-4 mr-1" />
             Sao chép
           </Button>
           <Button size="sm" onClick={openCreate}>
-            <Plus className="w-4 h-4 mr-1" />
+            <Icon name="plus" className="w-4 h-4 mr-1" />
             Thêm
           </Button>
         </div>
@@ -134,32 +139,27 @@ export default function BudgetPage() {
 
       {/* Overview cards */}
       {overview && (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
-            <div className="h-0.5 bg-blue-500" />
-            <div className="p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tổng kế hoạch</p>
-              <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(overview.totalPlanned)}</p>
-            </div>
-          </div>
-          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
-            <div className={`h-0.5 ${overview.totalActual > overview.totalPlanned ? "bg-red-500" : "bg-orange-400"}`} />
-            <div className="p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Đã chi</p>
-              <p className={`text-lg font-bold tabular-nums mt-0.5 ${overview.totalActual > overview.totalPlanned ? "text-red-500" : "text-foreground"}`}>
-                {formatCurrency(overview.totalActual)}
-              </p>
-            </div>
-          </div>
-          <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
-            <div className={`h-0.5 ${overview.totalRemaining < 0 ? "bg-red-500" : "bg-green-500"}`} />
-            <div className="p-4">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Còn lại</p>
-              <p className={`text-lg font-bold tabular-nums mt-0.5 ${overview.totalRemaining < 0 ? "text-red-500" : "text-green-500"}`}>
-                {overview.totalRemaining < 0 ? "\u2212" : ""}{formatCurrency(Math.abs(overview.totalRemaining))}
-              </p>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <SummaryCard
+            title="Tổng kế hoạch"
+            value={formatCurrency(overview.totalPlanned)}
+            icon="book-open"
+            theme="blue"
+          />
+          
+          <SummaryCard
+            title="Đã chi"
+            value={formatCurrency(overview.totalSpent ?? 0)}
+            icon="arrow-up-right"
+            theme={(overview.totalSpent ?? 0) > overview.totalPlanned ? "rose" : "orange"}
+          />
+          
+          <SummaryCard
+            title="Còn lại"
+            value={(overview.totalRemaining < 0 ? "\u2212" : "") + formatCurrency(Math.abs(overview.totalRemaining))}
+            icon="chart-pie"
+            theme={overview.totalRemaining < 0 ? "rose" : "emerald"}
+          />
         </div>
       )}
 
