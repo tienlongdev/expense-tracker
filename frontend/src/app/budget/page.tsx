@@ -168,7 +168,15 @@ export default function BudgetPage() {
       )}
 
       <BudgetList
-        budgets={budgets}
+        budgets={budgets.map(b => {
+          const status = overview?.categories.find(c => c.categoryId === b.categoryId);
+          return {
+            ...b,
+            actualAmount:    status?.spentAmount    ?? 0,
+            percentUsed:     status?.usedPercent    ?? 0,
+            remainingAmount: status?.remainingAmount ?? b.plannedAmount,
+          };
+        })}
         loading={loading}
         onEdit={openEdit}
         onDelete={handleDelete}

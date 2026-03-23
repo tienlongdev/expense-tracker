@@ -97,8 +97,8 @@ export default function SavingsAccountList({
         const isProfit  = acc.profitLoss >= 0;
         const plColor   = isProfit ? "text-green-500" : "text-red-500";
         const plPrefix  = isProfit ? "+" : "−";
-        const plPct     = acc.principalAmount > 0
-          ? ((Math.abs(acc.profitLoss) / acc.principalAmount) * 100).toFixed(1)
+        const plPct     = acc.totalDeposited > 0
+          ? ((Math.abs(acc.profitLoss) / acc.totalDeposited) * 100).toFixed(1)
           : null;
 
         return (
@@ -139,11 +139,11 @@ export default function SavingsAccountList({
                   <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${isProfit ? "bg-green-500" : "bg-red-500"}`}
-                      style={{ width: `${Math.min(Math.abs((acc.profitLoss / acc.principalAmount) * 100), 100)}%` }}
+                      style={{ width: `${Math.min(Math.abs((acc.profitLoss / acc.totalDeposited) * 100), 100)}%` }}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground tabular-nums">
-                    Vốn: {formatCurrency(acc.principalAmount)}
+                    Vốn: {formatCurrency(acc.totalDeposited)}
                   </p>
                 </div>
               )}

@@ -164,7 +164,7 @@ export default function SavingsPage() {
             <div className="h-0.5 bg-blue-500" />
             <div className="p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tổng vốn</p>
-              <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(summary.totalPrincipal)}</p>
+              <p className="text-lg font-bold tabular-nums mt-0.5">{formatCurrency(summary.totalDeposited)}</p>
             </div>
           </div>
           <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
@@ -182,7 +182,7 @@ export default function SavingsPage() {
                 {summary.totalProfitLoss >= 0 ? "+" : "\u2212"}{formatCurrency(Math.abs(summary.totalProfitLoss))}
               </p>
               <p className="text-xs text-muted-foreground tabular-nums">
-                {summary.profitLossPercentage >= 0 ? "+" : "\u2212"}{Math.abs(summary.profitLossPercentage ?? 0).toFixed(1)}%
+                {summary.totalProfitPercent >= 0 ? "+" : "\u2212"}{Math.abs(summary.totalProfitPercent ?? 0).toFixed(1)}%
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function SavingsPage() {
             <div className="p-4">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Đang hoạt động</p>
               <p className="text-lg font-bold tabular-nums mt-0.5">
-                {summary.activeCount} <span className="text-sm font-normal text-muted-foreground">/ {summary.totalCount}</span>
+                {summary.activeCount} <span className="text-sm font-normal text-muted-foreground">/ {summary.activeCount + summary.maturedCount + summary.closedCount}</span>
               </p>
             </div>
           </div>
@@ -295,7 +295,7 @@ export default function SavingsPage() {
                   className="flex items-center justify-between px-3 py-2.5 rounded-lg ring-1 ring-border/60 bg-card"
                 >
                   <div>
-                    <p className="text-xs font-medium">{h.transactionType}</p>
+                    <p className="text-xs font-medium">{h.transactionTypeName}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(h.date).toLocaleDateString("vi-VN")}
                       {h.note && ` · ${h.note}`}
@@ -304,7 +304,7 @@ export default function SavingsPage() {
                   <div className="text-right">
                     <p className="text-xs font-semibold tabular-nums">{formatCurrency(h.amount)}</p>
                     <p className="text-xs text-muted-foreground tabular-nums">
-                      → {formatCurrency(h.currentValueAfter)}
+                      → {formatCurrency(h.newValue)}
                     </p>
                   </div>
                 </div>
