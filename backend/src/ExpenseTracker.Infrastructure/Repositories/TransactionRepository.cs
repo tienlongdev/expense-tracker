@@ -22,10 +22,41 @@ public class TransactionRepository : ITransactionRepository
     // CRUD
     // ========================
 
-    public async Task<IEnumerable<Transaction>> GetAllAsync()
-        => await QueryWithCategory()
+    public async Task<(IReadOnlyList<Transaction> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        DateTime? fromDate,
+        DateTime? toDate,
+        TransactionType? type,
+        string? title)
+    {
+        var query = QueryWithCategory().AsNoTracking();
+
+        if (fromDate.HasValue)
+            query = query.Where(t => t.Date.Date >= fromDate.Value.Date);
+
+        if (toDate.HasValue)
+            query = query.Where(t => t.Date.Date <= toDate.Value.Date);
+
+        if (type.HasValue)
+            query = query.Where(t => t.Type == type.Value);
+
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            var normalizedTitle = title.Trim();
+            query = query.Where(t => t.Title.Contains(normalizedTitle));
+        }
+
+        var totalCount = await query.CountAsync();
+        var items = await query
             .OrderByDescending(t => t.Date)
+            .ThenByDescending(t => t.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (items, totalCount);
+    }
 
     public async Task<Transaction?> GetByIdAsync(Guid id)
         => await QueryWithCategory()

@@ -6,7 +6,14 @@ namespace ExpenseTracker.Domain.Interfaces;
 public interface ITransactionRepository
 {
     // CRUD
-    Task<IEnumerable<Transaction>> GetAllAsync();
+    Task<(IReadOnlyList<Transaction> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        DateTime? fromDate,
+        DateTime? toDate,
+        TransactionType? type,
+        string? title
+    );
     Task<Transaction?> GetByIdAsync(Guid id);
     Task<Transaction> CreateAsync(Transaction transaction);
     Task<Transaction> UpdateAsync(Transaction transaction);

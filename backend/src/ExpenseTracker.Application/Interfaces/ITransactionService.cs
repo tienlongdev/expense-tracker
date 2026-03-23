@@ -5,7 +5,7 @@ namespace ExpenseTracker.Application.Interfaces;
 public interface ITransactionService
 {
     // CRUD
-    Task<IEnumerable<TransactionDto>> GetAllAsync();
+    Task<PagedResultDto<TransactionDto>> GetPagedAsync(TransactionQueryDto query);
     Task<TransactionDto?> GetByIdAsync(Guid id);
     Task<TransactionDto> CreateAsync(CreateTransactionDto dto);
     Task<TransactionDto?> UpdateAsync(Guid id, UpdateTransactionDto dto);

@@ -4,15 +4,15 @@ import CategoryForm from "@/components/category/CategoryForm";
 import CategoryList from "@/components/category/CategoryList";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import { useCategories } from "@/hooks/useCategories";
 import { Category, CreateCategoryDto, UpdateCategoryDto } from "@/types/category";
 import { TransactionType } from "@/types/transaction";
-import { Plus } from "lucide-react";
+import Icon from "@/components/ui/Icon";
 import { useState } from "react";
 
 export default function CategoryPage() {
@@ -77,34 +77,34 @@ export default function CategoryPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Danh mục</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Danh mục</h1>
           <p className="text-sm text-muted-foreground mt-1">
             {categories.length} danh mục · {incomeCount} thu nhập · {expenseCount} chi tiêu
           </p>
         </div>
         <Button onClick={openCreate} size="sm">
-          <Plus className="w-4 h-4 mr-1" />
+          <Icon name="plus" className="w-4 h-4 mr-1" />
           Thêm danh mục
         </Button>
       </div>
 
       {/* Summary mini-cards */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
           <div className="h-0.5 bg-primary" />
           <div className="p-4">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tất cả</p>
             <p className="text-lg font-bold tabular-nums mt-0.5">{categories.length}</p>
           </div>
         </div>
-        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
           <div className="h-0.5 bg-green-500" />
           <div className="p-4">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Thu nhập</p>
             <p className="text-lg font-bold tabular-nums mt-0.5 text-green-500">{incomeCount}</p>
           </div>
         </div>
-        <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+        <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
           <div className="h-0.5 bg-red-500" />
           <div className="p-4">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Chi tiêu</p>

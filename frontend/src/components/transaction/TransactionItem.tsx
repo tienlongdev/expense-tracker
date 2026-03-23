@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/Icon";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { Transaction, TransactionType } from "@/types/transaction";
-import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface TransactionItemProps {
@@ -21,12 +21,20 @@ export default function TransactionItem({
   const isIncome = transaction.type === TransactionType.Income;
 
   return (
-    <div className="group flex items-center gap-4 px-4 py-3 rounded-xl border border-border/60 bg-card hover:border-border hover:shadow-sm transition-all duration-150">
-
-      {/* Icon */}
-      <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold
-        ${isIncome ? "bg-green-500/15 text-green-500" : "bg-red-500/15 text-red-500"}`}>
-        {isIncome ? "↑" : "↓"}
+    <div className="group flex items-center gap-4 px-4 py-3 rounded-xl border border-border/50 bg-card hover:border-border hover:shadow-md transition-all duration-200">
+      {/* Gradient icon */}
+      <div
+        className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110
+          ${isIncome
+            ? "bg-gradient-to-br from-emerald-400/20 to-emerald-600/10"
+            : "bg-gradient-to-br from-rose-400/20 to-rose-600/10"
+          }`}
+      >
+        <Icon
+          name={isIncome ? "arrow-up" : "arrow-down"}
+          variant="solid"
+          className={`w-4 h-4 ${isIncome ? "text-emerald-500" : "text-rose-500"}`}
+        />
       </div>
 
       {/* Info */}
@@ -56,46 +64,25 @@ export default function TransactionItem({
       <div className="shrink-0 flex items-center gap-1">
         {!confirmDelete ? (
           <>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => onEdit(transaction)}
-            >
-              <Pencil className="w-3.5 h-3.5" />
+            <Button size="icon" variant="ghost" className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-all hover:scale-110" onClick={() => onEdit(transaction)}>
+              <Icon name="pencil" className="w-3.5 h-3.5 text-muted-foreground" />
             </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-              onClick={() => setConfirmDelete(true)}
-            >
-              <Trash2 className="w-3.5 h-3.5" />
+            <Button size="icon" variant="ghost" className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setConfirmDelete(true)}>
+              <Icon name="trash" className="w-3.5 h-3.5" />
             </Button>
           </>
         ) : (
           <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-2 duration-150">
             <span className="text-xs text-muted-foreground mr-1">Xoá?</span>
-            <Button
-              size="sm"
-              variant="destructive"
-              className="h-7 px-2.5 text-xs"
-              onClick={() => onDelete(transaction.id)}
-            >
+            <Button size="sm" variant="destructive" className="h-7 px-2.5 text-xs" onClick={() => onDelete(transaction.id)}>
               Xoá
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2.5 text-xs"
-              onClick={() => setConfirmDelete(false)}
-            >
+            <Button size="sm" variant="outline" className="h-7 px-2.5 text-xs" onClick={() => setConfirmDelete(false)}>
               Huỷ
             </Button>
           </div>
         )}
       </div>
-
     </div>
   );
 }

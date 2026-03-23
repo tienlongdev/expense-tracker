@@ -31,7 +31,7 @@ export default function MonthlyBarChart({
 
   if (loading) return (
     <Card className="overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border/30 bg-gradient-to-r from-card via-muted/10 to-card">
         <div>
           <div className="h-4 w-36 bg-muted animate-pulse rounded" />
           <div className="h-3 w-20 bg-muted animate-pulse rounded mt-1.5" />
@@ -46,8 +46,8 @@ export default function MonthlyBarChart({
           <div className="absolute inset-0 flex items-end gap-1.5">
             {SKELETON_HEIGHTS.map((h, i) => (
               <div key={i} className="flex-1 flex items-end gap-0.5">
-                <div className="flex-1 bg-green-500/20 rounded-t animate-pulse" style={{ height: `${h}%` }} />
-                <div className="flex-1 bg-red-500/20 rounded-t animate-pulse" style={{ height: `${h * 0.7}%` }} />
+                <div className="flex-1 bg-emerald-500/15 rounded-t animate-pulse" style={{ height: `${h}%` }} />
+                <div className="flex-1 bg-rose-500/15 rounded-t animate-pulse" style={{ height: `${h * 0.7}%` }} />
               </div>
             ))}
           </div>
@@ -59,19 +59,21 @@ export default function MonthlyBarChart({
   const hoveredData = hovered !== null ? data.find((d) => d.month === hovered) : null;
 
   return (
-    <Card className="overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+    <Card className="overflow-hidden transition-shadow duration-300 hover:shadow-lg">
+      {/* Header with subtle gradient */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border/30 bg-gradient-to-r from-card via-muted/10 to-card">
         <div>
-          <p className="font-semibold text-sm">Tổng quan theo tháng</p>
+          <p className="font-semibold text-sm tracking-tight">Tổng quan theo tháng</p>
           <p className="text-xs text-muted-foreground mt-0.5">Năm {year}</p>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="w-2.5 h-2.5 rounded-sm bg-green-500 inline-block" /> Thu nhập
+        <div className="flex items-center gap-5">
+          <span className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 inline-block shadow-sm" />
+            Thu nhập
           </span>
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="w-2.5 h-2.5 rounded-sm bg-red-500 inline-block" /> Chi tiêu
+          <span className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 inline-block shadow-sm" />
+            Chi tiêu
           </span>
         </div>
       </div>
@@ -83,15 +85,15 @@ export default function MonthlyBarChart({
           <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
             {gridLines.map((pct) => (
               <div key={pct} className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground/50 w-8 text-right shrink-0">
+                <span className="text-[10px] text-muted-foreground/40 w-8 text-right shrink-0">
                   {pct > 0 ? formatCurrency((maxAmount * pct) / 100).replace("₫","").trim() : "0"}
                 </span>
-                <div className="flex-1 border-t border-border/30" />
+                <div className="flex-1 border-t border-border/20" />
               </div>
             ))}
           </div>
 
-          {/* Bars — offset to the right of y-axis labels */}
+          {/* Bars */}
           <div className="absolute inset-0 ml-10 flex items-end gap-1.5">
             {data.map((d) => {
               const incomeH  = Math.max((d.totalIncome  / maxAmount) * 100, d.totalIncome  > 0 ? 2 : 0);
@@ -107,21 +109,33 @@ export default function MonthlyBarChart({
                   onMouseEnter={() => setHovered(d.month)}
                   onMouseLeave={() => setHovered(null)}
                 >
+                  {/* Income bar with gradient */}
                   <div className="flex-1 flex items-end" style={{ height: "100%" }}>
                     <div
-                      className="w-full rounded-t-sm transition-all duration-300"
+                      className="w-full rounded-t transition-all duration-300"
                       style={{
                         height: `${incomeH}%`,
-                        background: isHovered ? "#22c55e" : hasData ? "rgba(34,197,94,0.65)" : "transparent",
+                        background: isHovered
+                          ? "linear-gradient(to top, #059669, #34d399)"
+                          : hasData
+                          ? "linear-gradient(to top, rgba(16,185,129,0.7), rgba(52,211,153,0.5))"
+                          : "transparent",
+                        boxShadow: isHovered ? "0 -2px 8px rgba(16,185,129,0.3)" : "none",
                       }}
                     />
                   </div>
+                  {/* Expense bar with gradient */}
                   <div className="flex-1 flex items-end" style={{ height: "100%" }}>
                     <div
-                      className="w-full rounded-t-sm transition-all duration-300"
+                      className="w-full rounded-t transition-all duration-300"
                       style={{
                         height: `${expenseH}%`,
-                        background: isHovered ? "#ef4444" : hasData ? "rgba(239,68,68,0.65)" : "transparent",
+                        background: isHovered
+                          ? "linear-gradient(to top, #dc2626, #f87171)"
+                          : hasData
+                          ? "linear-gradient(to top, rgba(220,38,38,0.7), rgba(248,113,113,0.5))"
+                          : "transparent",
+                        boxShadow: isHovered ? "0 -2px 8px rgba(220,38,38,0.3)" : "none",
                       }}
                     />
                   </div>
@@ -137,7 +151,7 @@ export default function MonthlyBarChart({
             <div
               key={d.month}
               className={`flex-1 text-center text-[10px] font-medium transition-colors ${
-                hovered === d.month ? "text-foreground" : "text-muted-foreground/60"
+                hovered === d.month ? "text-foreground" : "text-muted-foreground/50"
               }`}
             >
               {SHORT_MONTHS[d.month - 1]}
@@ -147,21 +161,21 @@ export default function MonthlyBarChart({
 
         {/* Hover detail card */}
         {hoveredData && (
-          <div className="mt-4 flex items-center gap-6 px-4 py-3 rounded-xl bg-muted/50 border border-border/50 animate-in fade-in duration-150">
+          <div className="mt-4 flex items-center gap-6 px-4 py-3 rounded-xl bg-gradient-to-r from-muted/40 via-card to-muted/40 border border-border/30 shadow-lg animate-in fade-in duration-150">
             <p className="font-semibold text-sm shrink-0">{formatMonth(hoveredData.month)}</p>
             <div className="flex items-center gap-1.5 text-xs">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="w-2 h-2 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600" />
               <span className="text-muted-foreground">Thu:</span>
-              <span className="font-semibold text-green-500">+{formatCurrency(hoveredData.totalIncome)}</span>
+              <span className="font-semibold text-emerald-500">+{formatCurrency(hoveredData.totalIncome)}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
+              <span className="w-2 h-2 rounded-full bg-gradient-to-br from-rose-400 to-rose-600" />
               <span className="text-muted-foreground">Chi:</span>
-              <span className="font-semibold text-red-500">−{formatCurrency(hoveredData.totalExpense)}</span>
+              <span className="font-semibold text-rose-500">−{formatCurrency(hoveredData.totalExpense)}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs ml-auto">
               <span className="text-muted-foreground">Số dư:</span>
-              <span className={`font-bold ${hoveredData.balance >= 0 ? "text-blue-500" : "text-orange-500"}`}>
+              <span className={`font-bold ${hoveredData.balance >= 0 ? "text-sky-500" : "text-amber-500"}`}>
                 {hoveredData.balance >= 0 ? "+" : "−"}{formatCurrency(Math.abs(hoveredData.balance))}
               </span>
             </div>

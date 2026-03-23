@@ -6,6 +6,7 @@ services:
   # SQL Server
   # ========================
   sqlserver:
+    platform: linux/amd64
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: expense-sqlserver
     environment:
@@ -48,9 +49,9 @@ services:
       dockerfile: Dockerfile
     container_name: expense-frontend
     ports:
-      - "3000:3000"
+      - "3002:3002"
     environment:
-      NEXT_PUBLIC_API_URL: "http://localhost:6000"
+      NEXT_PUBLIC_API_URL: "http://localhost:5050"
     depends_on:
       - backend
 

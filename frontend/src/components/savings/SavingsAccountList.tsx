@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/Icon";
 import { formatCurrency, formatDate } from "@/lib/format";
 import {
     SAVINGS_STATUS_LABELS,
@@ -8,15 +9,6 @@ import {
     SavingsAccount,
     SavingsStatus,
 } from "@/types/savings";
-import {
-    ArrowDownCircle,
-    ArrowUpCircle,
-    History,
-    Pencil,
-    RefreshCw,
-    Trash2,
-    X,
-} from "lucide-react";
 import { useState } from "react";
 
 interface SavingsAccountListProps {
@@ -40,7 +32,7 @@ const STATUS_STYLES: Record<SavingsStatus, { accent: string; badge: string; labe
 
 function SkeletonItem() {
   return (
-    <div className="rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
+    <div className="rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card shadow-sm transition-all duration-200 hover:ring-border">
       <div className="h-0.5 bg-muted animate-pulse" />
       <div className="p-4 space-y-3">
         <div className="flex items-start justify-between gap-3">
@@ -110,12 +102,10 @@ export default function SavingsAccountList({
           : null;
 
         return (
-          <div key={acc.id} className="group rounded-xl overflow-hidden ring-1 ring-border/60 border-transparent bg-card">
-            {/* Accent bar */}
+          <div key={acc.id} className="group rounded-xl overflow-hidden ring-1 ring-border/40 border-transparent bg-card hover:ring-border shadow-sm transition-all duration-200">
             <div className={`h-0.5 ${styles.accent}`} />
-
             <div className="p-4 space-y-3">
-              {/* Header row */}
+              {/* Header */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -134,7 +124,6 @@ export default function SavingsAccountList({
                     </p>
                   )}
                 </div>
-
                 <div className="text-right shrink-0">
                   <p className="text-sm font-bold tabular-nums">{formatCurrency(acc.currentValue)}</p>
                   <p className={`text-xs font-medium tabular-nums ${plColor}`}>
@@ -144,8 +133,8 @@ export default function SavingsAccountList({
                 </div>
               </div>
 
-              {/* Progress bar */}
-              {acc.totalDeposited > 0 && (
+              {/* Progress */}
+              {acc.principalAmount > 0 && (
                 <div className="space-y-1">
                   <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
@@ -163,20 +152,20 @@ export default function SavingsAccountList({
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 {isActive ? (
                   <div className="flex gap-1 flex-wrap">
-                    <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => onDeposit(acc)} title="Nạp vốn">
-                      <ArrowDownCircle className="w-3.5 h-3.5 text-green-500" />
+                    <Button size="icon" variant="outline" className="h-7 w-7 hover:scale-110 transition-transform" onClick={() => onDeposit(acc)} title="Nạp vốn">
+                      <Icon name="arrow-down-circle" className="w-3.5 h-3.5 text-green-500" />
                     </Button>
-                    <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => onWithdraw(acc)} title="Rút vốn">
-                      <ArrowUpCircle className="w-3.5 h-3.5 text-red-500" />
+                    <Button size="icon" variant="outline" className="h-7 w-7 hover:scale-110 transition-transform" onClick={() => onWithdraw(acc)} title="Rút vốn">
+                      <Icon name="arrow-up-circle" className="w-3.5 h-3.5 text-red-500" />
                     </Button>
-                    <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => onUpdateValue(acc)} title="Cập nhật giá trị">
-                      <RefreshCw className="w-3.5 h-3.5 text-blue-500" />
+                    <Button size="icon" variant="outline" className="h-7 w-7 hover:scale-110 transition-transform" onClick={() => onUpdateValue(acc)} title="Cập nhật giá trị">
+                      <Icon name="refresh" className="w-3.5 h-3.5 text-blue-500" />
                     </Button>
-                    <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => onInterest(acc)} title="Nhận lãi">
+                    <Button size="icon" variant="outline" className="h-7 w-7 hover:scale-110 transition-transform" onClick={() => onInterest(acc)} title="Nhận lãi">
                       <span className="text-xs font-bold text-yellow-500">₫</span>
                     </Button>
-                    <Button size="icon" variant="outline" className="h-7 w-7" onClick={() => onClose(acc)} title="Đóng tài khoản">
-                      <X className="w-3.5 h-3.5 text-muted-foreground" />
+                    <Button size="icon" variant="outline" className="h-7 w-7 hover:scale-110 transition-transform" onClick={() => onClose(acc)} title="Đóng tài khoản">
+                      <Icon name="x" className="w-3.5 h-3.5 text-muted-foreground" />
                     </Button>
                   </div>
                 ) : (
@@ -184,42 +173,26 @@ export default function SavingsAccountList({
                 )}
 
                 <div className="flex gap-0.5">
-                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onHistory(acc)} title="Lịch sử">
-                    <History className="w-3.5 h-3.5" />
+                  <Button size="icon" variant="ghost" className="h-7 w-7 hover:scale-110 transition-transform" onClick={() => onHistory(acc)} title="Lịch sử">
+                    <Icon name="history" className="w-3.5 h-3.5" />
                   </Button>
                   {isActive && (
-                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(acc)} title="Sửa">
-                      <Pencil className="w-3.5 h-3.5" />
+                    <Button size="icon" variant="ghost" className="h-7 w-7 hover:scale-110 transition-transform" onClick={() => onEdit(acc)} title="Sửa">
+                      <Icon name="pencil" className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
                     </Button>
                   )}
                   {confirmId === acc.id ? (
                     <>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="h-7 px-2 text-xs"
-                        disabled={deletingId === acc.id}
-                        onClick={() => handleDelete(acc.id)}
-                      >
+                      <Button size="sm" variant="destructive" className="h-7 px-2 text-xs" disabled={deletingId === acc.id} onClick={() => handleDelete(acc.id)}>
                         Xóa
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 px-2 text-xs"
-                        onClick={() => setConfirmId(null)}
-                      >
+                      <Button size="sm" variant="outline" className="h-7 px-2 text-xs" onClick={() => setConfirmId(null)}>
                         Hủy
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7 text-destructive hover:text-destructive"
-                      onClick={() => setConfirmId(acc.id)}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive hover:scale-110 transition-transform" onClick={() => setConfirmId(acc.id)}>
+                      <Icon name="trash" className="w-3.5 h-3.5" />
                     </Button>
                   )}
                 </div>
@@ -231,19 +204,3 @@ export default function SavingsAccountList({
     </div>
   );
 }
-
-
-interface SavingsAccountListProps {
-  accounts: SavingsAccount[];
-  loading: boolean;
-  onEdit: (account: SavingsAccount) => void;
-  onDelete: (id: string) => Promise<void>;
-  onDeposit: (account: SavingsAccount) => void;
-  onWithdraw: (account: SavingsAccount) => void;
-  onUpdateValue: (account: SavingsAccount) => void;
-  onInterest: (account: SavingsAccount) => void;
-  onHistory: (account: SavingsAccount) => void;
-  onClose: (account: SavingsAccount) => void;
-}
-
-

@@ -3,6 +3,7 @@ import { budgetApi } from "@/lib/budget-api";
 import {
     Budget,
     BudgetOverview,
+    BudgetRecord,
     BulkUpsertBudgetDto,
     CopyBudgetDto,
     CreateBudgetDto,
@@ -11,21 +12,26 @@ import {
 import { useCallback, useEffect, useState } from "react";
 
 export function useBudget(year: number, month: number) {
-  const [budgets, setBudgets] = useState<Budget[]>([]);
+  // `budgets` = categories with spending from the overview (BudgetStatusDto[])
+  const [budgets, setBudgets]   = useState<Budget[]>([]);
   const [overview, setOverview] = useState<BudgetOverview | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // `records` = raw CRUD records (BudgetDto[]) — for edit/delete by id
+  const [records, setRecords]   = useState<BudgetRecord[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
 
   const fetchBudgets = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const [data, ov] = await Promise.all([
+      const [rawRecords, ov] = await Promise.all([
         budgetApi.getByMonth(year, month),
         budgetApi.getOverview(year, month),
       ]);
-      setBudgets(data);
+      setRecords(rawRecords);
       setOverview(ov);
+      // Use overview.categories as the primary list — has spentAmount
+      setBudgets(ov.categories ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Không thể tải ngân sách");
     } finally {
@@ -65,7 +71,8 @@ export function useBudget(year: number, month: number) {
   };
 
   return {
-    budgets,
+    budgets,   // BudgetStatusDto[] — has spentAmount, usedPercent
+    records,   // BudgetDto[]      — has id for CRUD
     overview,
     loading,
     error,

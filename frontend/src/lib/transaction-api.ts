@@ -1,16 +1,44 @@
 import {
     CreateTransactionDto,
     MonthlyReportDto,
+    PagedTransactionResult,
     SummaryDto,
     Transaction,
+    TransactionQueryParams,
     UpdateTransactionDto,
 } from "@/types/transaction";
 import { api } from "./api";
 
 export const transactionApi = {
   // CRUD
-  getAll: () =>
-    api.get<Transaction[]>("/api/transaction"),
+  getAll: async () => {
+    const pageSize = 100;
+    let page = 1;
+    let all: Transaction[] = [];
+
+    while (true) {
+      const result = await transactionApi.getPaged({ page, pageSize });
+      all = all.concat(result.items);
+
+      if (result.totalPages <= page) break;
+      page += 1;
+    }
+
+    return all;
+  },
+
+  getPaged: (query: TransactionQueryParams) => {
+    const params = new URLSearchParams();
+    params.set("page", String(query.page));
+    params.set("pageSize", String(query.pageSize));
+
+    if (query.fromDate) params.set("fromDate", query.fromDate);
+    if (query.toDate) params.set("toDate", query.toDate);
+    if (query.type) params.set("type", String(query.type));
+    if (query.title?.trim()) params.set("title", query.title.trim());
+
+    return api.get<PagedTransactionResult>(`/api/transaction?${params.toString()}`);
+  },
 
   getById: (id: string) =>
     api.get<Transaction>(`/api/transaction/${id}`),
