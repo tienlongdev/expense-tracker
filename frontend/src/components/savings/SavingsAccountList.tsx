@@ -134,7 +134,7 @@ export default function SavingsAccountList({
               </div>
 
               {/* Progress */}
-              {acc.principalAmount > 0 && (
+              {acc.totalDeposited > 0 && (
                 <div className="space-y-1">
                   <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                     <div
