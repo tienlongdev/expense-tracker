@@ -45,6 +45,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+static DateTime UtcDate(int year, int month, int day) =>
+    new(year, month, day, 0, 0, 0, DateTimeKind.Utc);
+
 // ========================
 // Auto Migrate + Seed
 // ========================
@@ -80,14 +83,14 @@ using (var scope = app.Services.CreateScope())
         {
             var now = DateTime.UtcNow;
             db.Transactions.AddRange(
-                new Transaction { Id = Guid.NewGuid(), Title = "Lương tháng 3", Amount = 15_000_000, Type = TransactionType.Income, CategoryId = new Guid("10000000-0000-0000-0000-000000000001"), Date = new DateTime(now.Year, now.Month, 1) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Tiền nhà tháng 3", Amount = 3_500_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000008"), Date = new DateTime(now.Year, now.Month, 2) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Ăn sáng + trưa", Amount = 250_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000001"), Date = new DateTime(now.Year, now.Month, 5) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Thu nhập freelance", Amount = 5_000_000, Type = TransactionType.Income, CategoryId = new Guid("10000000-0000-0000-0000-000000000002"), Date = new DateTime(now.Year, now.Month, 10) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Mua quần áo", Amount = 800_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000003"), Date = new DateTime(now.Year, now.Month, 12) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Khám sức khoẻ", Amount = 300_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000006"), Date = new DateTime(now.Year, now.Month, 15) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Điện + nước tháng 3", Amount = 450_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000011"), Date = new DateTime(now.Year, now.Month, 16) },
-                new Transaction { Id = Guid.NewGuid(), Title = "Đi grab + xăng", Amount = 350_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000009"), Date = new DateTime(now.Year, now.Month, 17) }
+                new Transaction { Id = Guid.NewGuid(), Title = "Lương tháng 3", Amount = 15_000_000, Type = TransactionType.Income, CategoryId = new Guid("10000000-0000-0000-0000-000000000001"), Date = UtcDate(now.Year, now.Month, 1) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Tiền nhà tháng 3", Amount = 3_500_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000008"), Date = UtcDate(now.Year, now.Month, 2) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Ăn sáng + trưa", Amount = 250_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000001"), Date = UtcDate(now.Year, now.Month, 5) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Thu nhập freelance", Amount = 5_000_000, Type = TransactionType.Income, CategoryId = new Guid("10000000-0000-0000-0000-000000000002"), Date = UtcDate(now.Year, now.Month, 10) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Mua quần áo", Amount = 800_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000003"), Date = UtcDate(now.Year, now.Month, 12) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Khám sức khoẻ", Amount = 300_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000006"), Date = UtcDate(now.Year, now.Month, 15) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Điện + nước tháng 3", Amount = 450_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000011"), Date = UtcDate(now.Year, now.Month, 16) },
+                new Transaction { Id = Guid.NewGuid(), Title = "Đi grab + xăng", Amount = 350_000, Type = TransactionType.Expense, CategoryId = new Guid("20000000-0000-0000-0000-000000000009"), Date = UtcDate(now.Year, now.Month, 17) }
             );
             db.SaveChanges();
         }

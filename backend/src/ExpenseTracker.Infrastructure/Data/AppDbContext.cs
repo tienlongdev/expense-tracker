@@ -25,12 +25,12 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Icon).HasMaxLength(50);
             entity.Property(e => e.Color).HasMaxLength(20);
             entity.Property(e => e.Type).HasConversion<int>().IsRequired();
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
         });
 
         // ========================
@@ -39,13 +39,13 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.Amount).HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(e => e.Type).HasConversion<int>().IsRequired();
             entity.Property(e => e.Date).IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
 
             entity.HasOne(t => t.Category)
                   .WithMany(c => c.Transactions)
@@ -59,15 +59,15 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Debt>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
             entity.Property(e => e.PersonName).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.OriginalAmount).HasColumnType("decimal(18,2)").IsRequired();
-            entity.Property(e => e.RemainingAmount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.OriginalAmount).HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(e => e.RemainingAmount).HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(e => e.Type).HasConversion<int>().IsRequired();
             entity.Property(e => e.Status).HasConversion<int>().IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
         });
 
         // ========================
@@ -76,11 +76,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<DebtPayment>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
-            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.Amount).HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(e => e.PaidDate).IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
 
             entity.HasOne(p => p.Debt)
                   .WithMany(d => d.Payments)
@@ -94,16 +94,16 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<SavingsAccount>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Type).HasConversion<int>().IsRequired();
-            entity.Property(e => e.InitialAmount).HasColumnType("decimal(18,2)").IsRequired();
-            entity.Property(e => e.TotalDeposited).HasColumnType("decimal(18,2)").IsRequired();
-            entity.Property(e => e.CurrentValue).HasColumnType("decimal(18,2)").IsRequired();
-            entity.Property(e => e.InterestRate).HasColumnType("decimal(5,2)");
+            entity.Property(e => e.InitialAmount).HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(e => e.TotalDeposited).HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(e => e.CurrentValue).HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(e => e.InterestRate).HasColumnType("numeric(5,2)");
             entity.Property(e => e.Status).HasConversion<int>().IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
         });
 
         // ========================
@@ -112,14 +112,14 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<SavingsHistory>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.TransactionType).HasConversion<int>().IsRequired();
-            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").IsRequired();
-            entity.Property(e => e.PreviousValue).HasColumnType("decimal(18,2)").IsRequired();
-            entity.Property(e => e.NewValue).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.Amount).HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(e => e.PreviousValue).HasColumnType("numeric(18,2)").IsRequired();
+            entity.Property(e => e.NewValue).HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.Date).IsRequired();
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
             entity.Ignore(e => e.ProfitLoss);
 
             entity.HasOne(h => h.SavingsAccount)
@@ -134,12 +134,12 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Budget>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Year).IsRequired();
             entity.Property(e => e.Month).IsRequired();
-            entity.Property(e => e.PlannedAmount).HasColumnType("decimal(18,2)").IsRequired();
+            entity.Property(e => e.PlannedAmount).HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
 
             // 1 category chỉ có 1 ngân sách mỗi tháng
             entity.HasIndex(e => new { e.CategoryId, e.Year, e.Month })
