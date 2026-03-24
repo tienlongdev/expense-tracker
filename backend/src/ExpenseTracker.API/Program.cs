@@ -4,8 +4,10 @@ using ExpenseTracker.Domain.Entities;
 using ExpenseTracker.Domain.Enums;
 using ExpenseTracker.Domain.Interfaces;
 using ExpenseTracker.Infrastructure.Data;
+using ExpenseTracker.Infrastructure.Jobs;
 using ExpenseTracker.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +29,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IDebtRepository, DebtRepository>();
 builder.Services.AddScoped<ISavingsRepository, SavingsRepository>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // DI — Services
 builder.Services.AddScoped<ITransactionService, TransactionService>();
@@ -34,6 +37,22 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDebtService, DebtService>();
 builder.Services.AddScoped<ISavingsService, SavingsService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Quartz.NET — Weekly Summary Job
+builder.Services.AddQuartz(q =>
+{
+    var jobKey = new JobKey("WeeklySummaryJob");
+
+    q.AddJob<WeeklySummaryJob>(opts => opts.WithIdentity(jobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("WeeklySummaryJob-trigger")
+        // Chạy mỗi Chủ nhật lúc 21:00 UTC (= 04:00 sáng Thứ 2 giờ ICT)
+        .WithCronSchedule("0 0 21 ? * SUN"));
+});
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", p =>

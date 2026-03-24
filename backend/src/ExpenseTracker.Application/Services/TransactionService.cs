@@ -9,10 +9,17 @@ namespace ExpenseTracker.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _repository;
+    private readonly INotificationService   _notificationService;
 
-    public TransactionService(ITransactionRepository repository)
+    /// <summary>CategoryId "Lương" seed cố định. Dùng để detect salary transaction.</summary>
+    private static readonly Guid SalaryCategoryId = new("10000000-0000-0000-0000-000000000001");
+
+    public TransactionService(
+        ITransactionRepository repository,
+        INotificationService   notificationService)
     {
-        _repository = repository;
+        _repository          = repository;
+        _notificationService = notificationService;
     }
 
     // ========================
@@ -52,15 +59,40 @@ public class TransactionService : ITransactionService
     {
         var transaction = new Transaction
         {
-            Title = dto.Title,
-            Amount = dto.Amount,
-            Type = dto.Type,
+            Title      = dto.Title,
+            Amount     = dto.Amount,
+            Type       = dto.Type,
             CategoryId = dto.CategoryId,
-            Date = dto.Date,
-            Note = dto.Note
+            Date       = dto.Date,
+            Note       = dto.Note
         };
 
         var created = await _repository.CreateAsync(transaction);
+
+        // ── Notification triggers ────────────────────────────────────────
+        // Fire-and-forget: không block response, lỗi notification không ảnh hưởng transaction
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                if (dto.Type == TransactionType.Expense)
+                {
+                    await _notificationService.TriggerBudgetAlertsAsync(
+                        dto.CategoryId, dto.Date.Year, dto.Date.Month);
+                }
+                else if (dto.Type == TransactionType.Income
+                         && dto.CategoryId == SalaryCategoryId)
+                {
+                    await _notificationService.TriggerSalaryReceivedAsync(dto.Amount, dto.Date);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Không crash request chính khi trigger notification lỗi
+                Console.Error.WriteLine($"[NotificationTrigger] {ex.Message}");
+            }
+        });
+
         return MapToDto(created);
     }
 
