@@ -1,4 +1,4 @@
-﻿using ExpenseTracker.Domain.Entities;
+using ExpenseTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Infrastructure.Data;
@@ -7,13 +7,14 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    public DbSet<Category> Categories => Set<Category>();
-    public DbSet<Transaction> Transactions => Set<Transaction>();
-    public DbSet<Debt> Debts => Set<Debt>();
-    public DbSet<DebtPayment> DebtPayments => Set<DebtPayment>();
-    public DbSet<SavingsAccount> SavingsAccounts => Set<SavingsAccount>();
-    public DbSet<SavingsHistory> SavingsHistories => Set<SavingsHistory>();
-    public DbSet<Budget> Budgets => Set<Budget>();
+    public DbSet<Category>        Categories      => Set<Category>();
+    public DbSet<Transaction>      Transactions    => Set<Transaction>();
+    public DbSet<Debt>             Debts           => Set<Debt>();
+    public DbSet<DebtPayment>      DebtPayments    => Set<DebtPayment>();
+    public DbSet<SavingsAccount>   SavingsAccounts => Set<SavingsAccount>();
+    public DbSet<SavingsHistory>   SavingsHistories => Set<SavingsHistory>();
+    public DbSet<Budget>           Budgets         => Set<Budget>();
+    public DbSet<Notification>     Notifications   => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -150,6 +151,24 @@ public class AppDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(b => b.CategoryId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ========================
+        // Notification
+        // ========================
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Type).HasConversion<int>().IsRequired();
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Message).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.DeduplicationKey).HasMaxLength(200);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+
+            // Index cho dedup lookup — nullable unique (SQL Server cho phép nhiều NULL)
+            entity.HasIndex(e => e.DeduplicationKey)
+                  .HasDatabaseName("IX_Notification_DeduplicationKey");
         });
     }
 }

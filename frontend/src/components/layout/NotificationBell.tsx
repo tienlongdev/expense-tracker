@@ -98,7 +98,7 @@ export default function NotificationBell() {
       </Button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-[60] w-80 max-w-[calc(100vw-1rem)]
+        <div className="absolute right-0 top-full mt-2 z-[100] w-80 max-w-[calc(100vw-1rem)]
           bg-card border border-border/50 rounded-xl shadow-2xl overflow-hidden
           animate-in fade-in-0 zoom-in-95 slide-in-from-top-1 duration-200 origin-top-right">
 

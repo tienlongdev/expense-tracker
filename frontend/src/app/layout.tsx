@@ -26,7 +26,7 @@ export default function RootLayout({
             <AppSidebar />
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
               {/* Glassy header — desktop only */}
-              <header className="hidden lg:flex h-14 shrink-0 items-center justify-end gap-1.5 px-6 border-b border-border/30 bg-background/70 backdrop-blur-xl">
+              <header className="relative z-50 hidden lg:flex h-14 shrink-0 items-center justify-end gap-1.5 px-6 border-b border-border/30 bg-background/70 backdrop-blur-xl">
                 <NotificationBell />
                 <ThemeToggle />
               </header>
