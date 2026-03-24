@@ -3,6 +3,7 @@ using ExpenseTracker.Application.Interfaces;
 using ExpenseTracker.Domain.Entities;
 using ExpenseTracker.Domain.Enums;
 using ExpenseTracker.Domain.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ExpenseTracker.Application.Services;
 
