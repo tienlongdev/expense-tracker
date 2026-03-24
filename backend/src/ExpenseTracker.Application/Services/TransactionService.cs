@@ -9,17 +9,17 @@ namespace ExpenseTracker.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _repository;
-    private readonly INotificationService   _notificationService;
+    private readonly IServiceScopeFactory   _scopeFactory;
 
     /// <summary>CategoryId "Lương" seed cố định. Dùng để detect salary transaction.</summary>
     private static readonly Guid SalaryCategoryId = new("10000000-0000-0000-0000-000000000001");
 
     public TransactionService(
         ITransactionRepository repository,
-        INotificationService   notificationService)
+        IServiceScopeFactory   scopeFactory)
     {
-        _repository          = repository;
-        _notificationService = notificationService;
+        _repository   = repository;
+        _scopeFactory = scopeFactory;
     }
 
     // ========================
@@ -70,20 +70,23 @@ public class TransactionService : ITransactionService
         var created = await _repository.CreateAsync(transaction);
 
         // ── Notification triggers ────────────────────────────────────────
-        // Fire-and-forget: không block response, lỗi notification không ảnh hưởng transaction
+        // Fire-and-forget: dùng IServiceScopeFactory để tạo scope mới cho background task
         _ = Task.Run(async () =>
         {
             try
             {
+                using var scope = _scopeFactory.CreateScope();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+
                 if (dto.Type == TransactionType.Expense)
                 {
-                    await _notificationService.TriggerBudgetAlertsAsync(
+                    await notificationService.TriggerBudgetAlertsAsync(
                         dto.CategoryId, dto.Date.Year, dto.Date.Month);
                 }
                 else if (dto.Type == TransactionType.Income
                          && dto.CategoryId == SalaryCategoryId)
                 {
-                    await _notificationService.TriggerSalaryReceivedAsync(dto.Amount, dto.Date);
+                    await notificationService.TriggerSalaryReceivedAsync(dto.Amount, dto.Date);
                 }
             }
             catch (Exception ex)
