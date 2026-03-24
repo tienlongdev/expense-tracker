@@ -3,16 +3,24 @@ using ExpenseTracker.Application.Interfaces;
 using ExpenseTracker.Domain.Entities;
 using ExpenseTracker.Domain.Enums;
 using ExpenseTracker.Domain.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ExpenseTracker.Application.Services;
 
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _repository;
+    private readonly IServiceScopeFactory   _scopeFactory;
 
-    public TransactionService(ITransactionRepository repository)
+    /// <summary>CategoryId "Lương" seed cố định. Dùng để detect salary transaction.</summary>
+    private static readonly Guid SalaryCategoryId = new("10000000-0000-0000-0000-000000000001");
+
+    public TransactionService(
+        ITransactionRepository repository,
+        IServiceScopeFactory   scopeFactory)
     {
-        _repository = repository;
+        _repository   = repository;
+        _scopeFactory = scopeFactory;
     }
 
     // ========================
@@ -52,15 +60,43 @@ public class TransactionService : ITransactionService
     {
         var transaction = new Transaction
         {
-            Title = dto.Title,
-            Amount = dto.Amount,
-            Type = dto.Type,
+            Title      = dto.Title,
+            Amount     = dto.Amount,
+            Type       = dto.Type,
             CategoryId = dto.CategoryId,
-            Date = dto.Date,
-            Note = dto.Note
+            Date       = dto.Date,
+            Note       = dto.Note
         };
 
         var created = await _repository.CreateAsync(transaction);
+
+        // ── Notification triggers ────────────────────────────────────────
+        // Fire-and-forget: dùng IServiceScopeFactory để tạo scope mới cho background task
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+
+                if (dto.Type == TransactionType.Expense)
+                {
+                    await notificationService.TriggerBudgetAlertsAsync(
+                        dto.CategoryId, dto.Date.Year, dto.Date.Month);
+                }
+                else if (dto.Type == TransactionType.Income
+                         && dto.CategoryId == SalaryCategoryId)
+                {
+                    await notificationService.TriggerSalaryReceivedAsync(dto.Amount, dto.Date);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Không crash request chính khi trigger notification lỗi
+                Console.Error.WriteLine($"[NotificationTrigger] {ex.Message}");
+            }
+        });
+
         return MapToDto(created);
     }
 
