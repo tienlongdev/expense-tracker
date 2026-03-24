@@ -3,20 +3,25 @@ version: "3.9"
 services:
 
   # ========================
-  # SQL Server
+  # PostgreSQL
   # ========================
-  sqlserver:
-    platform: linux/amd64
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: expense-sqlserver
+  postgres:
+    image: postgres:16-alpine
+    container_name: expense-postgres
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "YourStrong@Passw0rd"
-      MSSQL_PID: "Express"
+      POSTGRES_DB: "expense_tracker"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
     ports:
-      - "1433:1433"
+      - "5432:5432"
     volumes:
-      - sqlserver_data:/var/opt/mssql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d expense_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   # ========================
   # Backend API
@@ -31,13 +36,15 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       ConnectionStrings__DefaultConnection: >
-        Server=sqlserver,1433;
-        Database=ExpenseTrackerDb;
-        User Id=sa;
-        Password=YourStrong@Passw0rd;
-        TrustServerCertificate=True;
+        Host=postgres;
+        Port=5432;
+        Database=expense_tracker;
+        Username=postgres;
+        Password=postgres;
     depends_on:
-      - sqlserver
+      postgres:
+        condition: service_healthy
+    restart: on-failure
     command: ["sh", "-c", "sleep 10 && dotnet ExpenseTracker.API.dll"]
 
   # ========================
@@ -56,4 +63,4 @@ services:
       - backend
 
 volumes:
-  sqlserver_data:
+  postgres_data:
