@@ -46,7 +46,7 @@ public class NotificationRepository : INotificationRepository
 
     public async Task<bool> MarkAsReadAsync(Guid id)
     {
-        var notification = await _context.Notifications.FindAsync(id);
+        var notification = await _context.Notifications.FirstOrDefaultAsync(n => n.Id == id);
         if (notification is null) return false;
 
         notification.IsRead = true;
@@ -64,7 +64,7 @@ public class NotificationRepository : INotificationRepository
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var notification = await _context.Notifications.FindAsync(id);
+        var notification = await _context.Notifications.FirstOrDefaultAsync(n => n.Id == id);
         if (notification is null) return false;
 
         _context.Notifications.Remove(notification);

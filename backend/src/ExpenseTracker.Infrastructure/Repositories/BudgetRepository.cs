@@ -68,7 +68,7 @@ public class BudgetRepository : IBudgetRepository
 
     public async Task<Budget?> UpdateAsync(Budget budget)
     {
-        var existing = await _context.Budgets.FindAsync(budget.Id);
+        var existing = await _context.Budgets.FirstOrDefaultAsync(b => b.Id == budget.Id);
         if (existing is null) return null;
 
         existing.PlannedAmount = budget.PlannedAmount;
@@ -83,7 +83,7 @@ public class BudgetRepository : IBudgetRepository
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var entity = await _context.Budgets.FindAsync(id);
+        var entity = await _context.Budgets.FirstOrDefaultAsync(b => b.Id == id);
         if (entity is null) return false;
 
         _context.Budgets.Remove(entity);

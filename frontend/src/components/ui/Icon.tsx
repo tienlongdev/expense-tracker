@@ -26,6 +26,8 @@ export const iconMap = {
   "inbox":              { outline: OutlineIcons.InboxIcon,               solid: SolidIcons.InboxIcon },
   "wallet":             { outline: OutlineIcons.WalletIcon,              solid: SolidIcons.WalletIcon },
   "settings":           { outline: OutlineIcons.Cog6ToothIcon,           solid: SolidIcons.Cog6ToothIcon },
+  "user":               { outline: OutlineIcons.UserCircleIcon,          solid: SolidIcons.UserCircleIcon },
+  "log-out":            { outline: OutlineIcons.ArrowLeftStartOnRectangleIcon, solid: SolidIcons.ArrowLeftStartOnRectangleIcon },
 
   // Actions
   "plus":               { outline: OutlineIcons.PlusIcon,                solid: SolidIcons.PlusIcon },

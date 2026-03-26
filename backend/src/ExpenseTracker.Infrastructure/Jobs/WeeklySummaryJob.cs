@@ -1,14 +1,11 @@
 using ExpenseTracker.Application.Interfaces;
+using ExpenseTracker.Domain.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace ExpenseTracker.Infrastructure.Jobs;
 
-/// <summary>
-/// Quartz.NET job chạy mỗi Chủ nhật — tạo notification tổng kết chi tiêu tuần.
-/// Dùng IServiceScopeFactory vì Quartz job là Singleton còn INotificationService là Scoped.
-/// </summary>
 [DisallowConcurrentExecution]
 public class WeeklySummaryJob : IJob
 {
@@ -18,7 +15,7 @@ public class WeeklySummaryJob : IJob
     public WeeklySummaryJob(IServiceScopeFactory scopeFactory, ILogger<WeeklySummaryJob> logger)
     {
         _scopeFactory = scopeFactory;
-        _logger       = logger;
+        _logger = logger;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -27,19 +24,28 @@ public class WeeklySummaryJob : IJob
 
         try
         {
-            using var scope = _scopeFactory.CreateScope();
-            var notificationService = scope.ServiceProvider
-                .GetRequiredService<INotificationService>();
+            using var usersScope = _scopeFactory.CreateScope();
+            var userRepository = usersScope.ServiceProvider.GetRequiredService<IUserRepository>();
+            var users = await userRepository.GetAllAsync();
 
-            // Tuần kết thúc hôm nay (Chủ nhật), bắt đầu từ Thứ 2 (6 ngày trước)
-            var today     = DateTime.UtcNow.Date;
-            var weekEnd   = today;
+            var today = DateTime.UtcNow.Date;
+            var weekEnd = today;
             var weekStart = today.AddDays(-6);
 
-            await notificationService.TriggerWeeklySummaryAsync(weekStart, weekEnd);
+            foreach (var user in users)
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var currentUserService = scope.ServiceProvider.GetRequiredService<ICurrentUserService>();
+                currentUserService.SetOverrideUserId(user.Id);
 
-            _logger.LogInformation("[WeeklySummaryJob] Completed. Week: {Start} – {End}",
-                weekStart.ToString("dd/MM"), weekEnd.ToString("dd/MM"));
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+                await notificationService.TriggerWeeklySummaryAsync(weekStart, weekEnd);
+            }
+
+            _logger.LogInformation(
+                "[WeeklySummaryJob] Completed. Week: {Start} - {End}",
+                weekStart.ToString("dd/MM"),
+                weekEnd.ToString("dd/MM"));
         }
         catch (Exception ex)
         {

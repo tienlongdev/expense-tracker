@@ -1,28 +1,47 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6000";
+const ACCESS_TOKEN_KEY = "expense-tracker-access-token";
+
+function getAccessToken() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.localStorage.getItem(ACCESS_TOKEN_KEY);
+}
 
 async function fetcher<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {
+  const token = getAccessToken();
+
   const res = await fetch(`${API_URL}${endpoint}`, {
-    headers: { "Content-Type": "application/json" },
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options?.headers ?? {}),
+    },
   });
 
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== "undefined") {
+      window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+    }
+
     const error = await res.json().catch(() => ({}));
     throw new Error(error.message || `API Error: ${res.status}`);
   }
 
-  // 204 No Content
-  if (res.status === 204) return undefined as T;
+  if (res.status === 204) {
+    return undefined as T;
+  }
 
   return res.json();
 }
 
 export const api = {
-  get: <T>(endpoint: string) =>
-    fetcher<T>(endpoint),
+  get: <T>(endpoint: string) => fetcher<T>(endpoint),
 
   post: <T>(endpoint: string, body: unknown) =>
     fetcher<T>(endpoint, {

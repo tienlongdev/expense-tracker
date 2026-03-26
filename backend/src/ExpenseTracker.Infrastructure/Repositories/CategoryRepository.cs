@@ -22,7 +22,7 @@ public class CategoryRepository : ICategoryRepository
             .ToListAsync();
 
     public async Task<Category?> GetByIdAsync(Guid id)
-        => await _context.Categories.FindAsync(id);
+        => await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
 
     public async Task<IEnumerable<Category>> GetByTypeAsync(TransactionType type)
         => await _context.Categories
@@ -41,7 +41,7 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<Category?> UpdateAsync(Category category)
     {
-        var existing = await _context.Categories.FindAsync(category.Id);
+        var existing = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
         if (existing is null) return null;
 
         existing.Name      = category.Name;
@@ -56,7 +56,7 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var entity = await _context.Categories.FindAsync(id);
+        var entity = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
         if (entity is null) return false;
 
         _context.Categories.Remove(entity);

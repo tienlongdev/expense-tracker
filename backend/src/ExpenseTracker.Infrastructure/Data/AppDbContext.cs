@@ -1,3 +1,4 @@
+using ExpenseTracker.Application.Interfaces;
 using ExpenseTracker.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,24 +6,45 @@ namespace ExpenseTracker.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    private readonly ICurrentUserService _currentUserService;
 
-    public DbSet<Category>        Categories      => Set<Category>();
-    public DbSet<Transaction>      Transactions    => Set<Transaction>();
-    public DbSet<Debt>             Debts           => Set<Debt>();
-    public DbSet<DebtPayment>      DebtPayments    => Set<DebtPayment>();
-    public DbSet<SavingsAccount>   SavingsAccounts => Set<SavingsAccount>();
-    public DbSet<SavingsHistory>   SavingsHistories => Set<SavingsHistory>();
-    public DbSet<Budget>           Budgets         => Set<Budget>();
-    public DbSet<Notification>     Notifications   => Set<Notification>();
+    public AppDbContext(
+        DbContextOptions<AppDbContext> options,
+        ICurrentUserService currentUserService) : base(options)
+    {
+        _currentUserService = currentUserService;
+    }
+
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<Debt> Debts => Set<Debt>();
+    public DbSet<DebtPayment> DebtPayments => Set<DebtPayment>();
+    public DbSet<SavingsAccount> SavingsAccounts => Set<SavingsAccount>();
+    public DbSet<SavingsHistory> SavingsHistories => Set<SavingsHistory>();
+    public DbSet<Budget> Budgets => Set<Budget>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // ========================
-        // Category
-        // ========================
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.FullName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PreferredCurrency).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.TimeZone).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+
+            entity.HasIndex(e => e.Email)
+                .IsUnique()
+                .HasDatabaseName("IX_User_Email");
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -32,11 +54,14 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Color).HasMaxLength(20);
             entity.Property(e => e.Type).HasConversion<int>().IsRequired();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Categories)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ========================
-        // Transaction
-        // ========================
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -47,16 +72,19 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Date).IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
 
-            entity.HasOne(t => t.Category)
-                  .WithMany(c => c.Transactions)
-                  .HasForeignKey(t => t.CategoryId)
-                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Transactions)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Category)
+                .WithMany(c => c.Transactions)
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
-        // ========================
-        // Debt
-        // ========================
         modelBuilder.Entity<Debt>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -69,11 +97,14 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Status).HasConversion<int>().IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Debts)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ========================
-        // DebtPayment
-        // ========================
         modelBuilder.Entity<DebtPayment>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -82,16 +113,19 @@ public class AppDbContext : DbContext
             entity.Property(e => e.PaidDate).IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
 
-            entity.HasOne(p => p.Debt)
-                  .WithMany(d => d.Payments)
-                  .HasForeignKey(p => p.DebtId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.DebtPayments)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Debt)
+                .WithMany(d => d.Payments)
+                .HasForeignKey(e => e.DebtId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ========================
-        // SavingsAccount
-        // ========================
         modelBuilder.Entity<SavingsAccount>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -105,11 +139,14 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Status).HasConversion<int>().IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.SavingsAccounts)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ========================
-        // SavingsHistory
-        // ========================
         modelBuilder.Entity<SavingsHistory>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -122,16 +159,19 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Date).IsRequired();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
             entity.Ignore(e => e.ProfitLoss);
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
 
-            entity.HasOne(h => h.SavingsAccount)
-                  .WithMany(a => a.History)
-                  .HasForeignKey(h => h.SavingsAccountId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.SavingsHistories)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.SavingsAccount)
+                .WithMany(a => a.History)
+                .HasForeignKey(e => e.SavingsAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ========================
-        // Budget
-        // ========================
         modelBuilder.Entity<Budget>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -141,34 +181,83 @@ public class AppDbContext : DbContext
             entity.Property(e => e.PlannedAmount).HasColumnType("numeric(18,2)").IsRequired();
             entity.Property(e => e.Note).HasMaxLength(500);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
 
-            // 1 category chỉ có 1 ngân sách mỗi tháng
-            entity.HasIndex(e => new { e.CategoryId, e.Year, e.Month })
-                  .IsUnique()
-                  .HasDatabaseName("IX_Budget_Category_YearMonth");
+            entity.HasIndex(e => new { e.UserId, e.CategoryId, e.Year, e.Month })
+                .IsUnique()
+                .HasDatabaseName("IX_Budget_User_Category_YearMonth");
 
-            entity.HasOne(b => b.Category)
-                  .WithMany()
-                  .HasForeignKey(b => b.CategoryId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Budgets)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Category)
+                .WithMany()
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ========================
-        // Notification
-        // ========================
         modelBuilder.Entity<Notification>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Type).HasConversion<int>().IsRequired();
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Message).IsRequired().HasMaxLength(1000);
             entity.Property(e => e.DeduplicationKey).HasMaxLength(200);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
+            entity.HasQueryFilter(e => _currentUserService.UserId.HasValue && e.UserId == _currentUserService.UserId.Value);
 
-            // Index cho dedup lookup — nullable unique (SQL Server cho phép nhiều NULL)
-            entity.HasIndex(e => e.DeduplicationKey)
-                  .HasDatabaseName("IX_Notification_DeduplicationKey");
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Notifications)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.UserId, e.DeduplicationKey })
+                .HasDatabaseName("IX_Notification_User_DeduplicationKey");
         });
+    }
+
+    public override int SaveChanges()
+    {
+        ApplyUserOwnership();
+        return base.SaveChanges();
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        ApplyUserOwnership();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ApplyUserOwnership();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        ApplyUserOwnership();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void ApplyUserOwnership()
+    {
+        var currentUserId = _currentUserService.UserId;
+        if (!currentUserId.HasValue)
+        {
+            return;
+        }
+
+        foreach (var entry in ChangeTracker.Entries<IUserOwnedEntity>()
+                     .Where(e => e.State == EntityState.Added))
+        {
+            if (entry.Entity.UserId == Guid.Empty)
+            {
+                entry.Entity.UserId = currentUserId.Value;
+            }
+        }
     }
 }

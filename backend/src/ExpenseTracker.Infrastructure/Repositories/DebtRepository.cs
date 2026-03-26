@@ -42,7 +42,7 @@ public class DebtRepository : IDebtRepository
 
     public async Task<Debt?> UpdateAsync(Debt debt)
     {
-        var existing = await _context.Debts.FindAsync(debt.Id);
+        var existing = await _context.Debts.FirstOrDefaultAsync(d => d.Id == debt.Id);
         if (existing is null) return null;
 
         existing.Title           = debt.Title;
@@ -59,7 +59,7 @@ public class DebtRepository : IDebtRepository
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var entity = await _context.Debts.FindAsync(id);
+        var entity = await _context.Debts.FirstOrDefaultAsync(d => d.Id == id);
         if (entity is null) return false;
 
         _context.Debts.Remove(entity);

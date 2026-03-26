@@ -131,3 +131,22 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 ```
 
 <!-- pair extraordinaire -->
+
+## Phase 1: Authentication va Multi-user
+
+Bo sung endpoint moi:
+
+- `POST /api/Auth/register`
+- `POST /api/Auth/login`
+- `GET /api/Auth/me`
+- `PUT /api/Auth/profile`
+
+Bo sung page moi:
+
+- `/login`
+- `/profile`
+
+Tai khoan demo mac dinh sau khi migrate/chay app:
+
+- Email: `demo@expense-tracker.local`
+- Password: `Demo@123`

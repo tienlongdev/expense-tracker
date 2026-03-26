@@ -42,7 +42,7 @@ public class SavingsRepository : ISavingsRepository
 
     public async Task<SavingsAccount?> UpdateAsync(SavingsAccount account)
     {
-        var existing = await _context.SavingsAccounts.FindAsync(account.Id);
+        var existing = await _context.SavingsAccounts.FirstOrDefaultAsync(a => a.Id == account.Id);
         if (existing is null) return null;
 
         existing.Name           = account.Name;
@@ -60,7 +60,7 @@ public class SavingsRepository : ISavingsRepository
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var entity = await _context.SavingsAccounts.FindAsync(id);
+        var entity = await _context.SavingsAccounts.FirstOrDefaultAsync(a => a.Id == id);
         if (entity is null) return false;
 
         _context.SavingsAccounts.Remove(entity);

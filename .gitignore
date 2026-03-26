@@ -1,29 +1,26 @@
 # ========================
 # .NET
 # ========================
-**/bin/
-**/obj/
+bin/
+obj/
+.vs/
+.dotnet/
+.nuget/
 *.user
 *.suo
-.vs/
-**/*.db
-**/*.db-shm
-**/*.db-wal
+*.db
+*.db-shm
+*.db-wal
 
 # ========================
 # Node / Next.js
 # ========================
-**/node_modules/
-**/.next/
-**/out/
-**/.env
-**/.env.local
-**/.env.production
-
-# ========================
-# Docker
-# ========================
-**/.dockerignore
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env.production
 
 # ========================
 # OS

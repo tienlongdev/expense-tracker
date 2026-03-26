@@ -10,22 +10,21 @@ namespace ExpenseTracker.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _repository;
-    private readonly IServiceScopeFactory   _scopeFactory;
-
-    /// <summary>CategoryId "Lương" seed cố định. Dùng để detect salary transaction.</summary>
-    private static readonly Guid SalaryCategoryId = new("10000000-0000-0000-0000-000000000001");
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly ICategoryRepository _categoryRepository;
 
     public TransactionService(
         ITransactionRepository repository,
-        IServiceScopeFactory   scopeFactory)
+        IServiceScopeFactory scopeFactory,
+        ICurrentUserService currentUserService,
+        ICategoryRepository categoryRepository)
     {
-        _repository   = repository;
+        _repository = repository;
         _scopeFactory = scopeFactory;
+        _currentUserService = currentUserService;
+        _categoryRepository = categoryRepository;
     }
-
-    // ========================
-    // CRUD
-    // ========================
 
     public async Task<PagedResultDto<TransactionDto>> GetPagedAsync(TransactionQueryDto query)
     {
@@ -38,8 +37,7 @@ public class TransactionService : ITransactionService
             query.FromDate,
             query.ToDate,
             query.Type,
-            query.Title
-        );
+            query.Title);
 
         return new PagedResultDto<TransactionDto>
         {
@@ -60,39 +58,43 @@ public class TransactionService : ITransactionService
     {
         var transaction = new Transaction
         {
-            Title      = dto.Title,
-            Amount     = dto.Amount,
-            Type       = dto.Type,
+            Title = dto.Title,
+            Amount = dto.Amount,
+            Type = dto.Type,
             CategoryId = dto.CategoryId,
-            Date       = dto.Date,
-            Note       = dto.Note
+            Date = dto.Date,
+            Note = dto.Note
         };
 
         var created = await _repository.CreateAsync(transaction);
+        var currentUserId = _currentUserService.UserId;
 
-        // ── Notification triggers ────────────────────────────────────────
-        // Fire-and-forget: dùng IServiceScopeFactory để tạo scope mới cho background task
+        var category = await _categoryRepository.GetByIdAsync(dto.CategoryId);
+        var isSalaryCategory = dto.Type == TransactionType.Income
+            && category is not null
+            && string.Equals(category.Name.Trim(), "Lương", StringComparison.OrdinalIgnoreCase);
+
         _ = Task.Run(async () =>
         {
             try
             {
                 using var scope = _scopeFactory.CreateScope();
+                var scopedCurrentUser = scope.ServiceProvider.GetRequiredService<ICurrentUserService>();
+                scopedCurrentUser.SetOverrideUserId(currentUserId);
+
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
                 if (dto.Type == TransactionType.Expense)
                 {
-                    await notificationService.TriggerBudgetAlertsAsync(
-                        dto.CategoryId, dto.Date.Year, dto.Date.Month);
+                    await notificationService.TriggerBudgetAlertsAsync(dto.CategoryId, dto.Date.Year, dto.Date.Month);
                 }
-                else if (dto.Type == TransactionType.Income
-                         && dto.CategoryId == SalaryCategoryId)
+                else if (isSalaryCategory)
                 {
                     await notificationService.TriggerSalaryReceivedAsync(dto.Amount, dto.Date);
                 }
             }
             catch (Exception ex)
             {
-                // Không crash request chính khi trigger notification lỗi
                 Console.Error.WriteLine($"[NotificationTrigger] {ex.Message}");
             }
         });
@@ -103,7 +105,10 @@ public class TransactionService : ITransactionService
     public async Task<TransactionDto?> UpdateAsync(Guid id, UpdateTransactionDto dto)
     {
         var existing = await _repository.GetByIdAsync(id);
-        if (existing is null) return null;
+        if (existing is null)
+        {
+            return null;
+        }
 
         existing.Title = dto.Title;
         existing.Amount = dto.Amount;
@@ -118,10 +123,6 @@ public class TransactionService : ITransactionService
 
     public async Task<bool> DeleteAsync(Guid id)
         => await _repository.DeleteAsync(id);
-
-    // ========================
-    // Filter
-    // ========================
 
     public async Task<IEnumerable<TransactionDto>> GetByDateAsync(DateTime date)
     {
@@ -140,10 +141,6 @@ public class TransactionService : ITransactionService
         var transactions = await _repository.GetByYearAsync(year);
         return transactions.Select(MapToDto);
     }
-
-    // ========================
-    // Summary
-    // ========================
 
     public async Task<SummaryDto> GetSummaryAsync()
     {
@@ -166,38 +163,38 @@ public class TransactionService : ITransactionService
         return new SummaryDto { TotalIncome = income, TotalExpense = expense };
     }
 
-    // ========================
-    // Report
-    // ========================
-
     public async Task<IEnumerable<MonthlyReportDto>> GetYearlyReportAsync(int year)
     {
         var report = new List<MonthlyReportDto>();
-        for (int m = 1; m <= 12; m++)
+        for (var month = 1; month <= 12; month++)
         {
-            var income = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Income, year, m);
-            var expense = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Expense, year, m);
-            report.Add(new MonthlyReportDto { Month = m, Year = year, TotalIncome = income, TotalExpense = expense });
+            var income = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Income, year, month);
+            var expense = await _repository.GetTotalByTypeAndMonthAsync(TransactionType.Expense, year, month);
+
+            report.Add(new MonthlyReportDto
+            {
+                Month = month,
+                Year = year,
+                TotalIncome = income,
+                TotalExpense = expense
+            });
         }
+
         return report;
     }
 
-    // ========================
-    // Mapping
-    // ========================
-
-    private static TransactionDto MapToDto(Transaction t) => new()
+    private static TransactionDto MapToDto(Transaction transaction) => new()
     {
-        Id = t.Id,
-        Title = t.Title,
-        Amount = t.Amount,
-        Type = t.Type,
-        CategoryId = t.CategoryId,
-        CategoryName = t.Category?.Name ?? string.Empty,
-        CategoryIcon = t.Category?.Icon,
-        CategoryColor = t.Category?.Color,
-        Date = t.Date,
-        Note = t.Note,
-        CreatedAt = t.CreatedAt
+        Id = transaction.Id,
+        Title = transaction.Title,
+        Amount = transaction.Amount,
+        Type = transaction.Type,
+        CategoryId = transaction.CategoryId,
+        CategoryName = transaction.Category?.Name ?? string.Empty,
+        CategoryIcon = transaction.Category?.Icon,
+        CategoryColor = transaction.Category?.Color,
+        Date = transaction.Date,
+        Note = transaction.Note,
+        CreatedAt = transaction.CreatedAt
     };
 }
