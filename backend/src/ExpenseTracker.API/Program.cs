@@ -16,10 +16,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(15), errorNumbersToAdd: null)
+        npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(15), errorCodesToAdd: null)
     )
 );
 

@@ -9,7 +9,7 @@ Personal Finance Management App built with **.NET 10** + **Next.js 15**.
 | Layer      | Technology                        |
 |------------|-----------------------------------|
 | Backend    | .NET 10, ASP.NET Core, EF Core    |
-| Database   | SQL Server 2022                   |
+| Database   | PostgreSQL 16                     |
 | Frontend   | Next.js 15, TypeScript            |
 | UI         | Tailwind CSS v4, shadcn/ui        |
 | Container  | Docker, Docker Compose            |
@@ -51,9 +51,9 @@ cd expense-tracker
 docker-compose up --build
 
 # Open browser
-# Frontend: http://localhost:3000
-# Backend:  http://localhost:5000
-# API Docs: http://localhost:5000/openapi
+# Frontend: http://localhost:3002
+# Backend:  http://localhost:5050
+# API Docs: http://localhost:5050/openapi
 ```
 
 ### Option B — Local Development
@@ -71,7 +71,7 @@ dotnet ef database update \
 # Run
 cd src/ExpenseTracker.API
 dotnet run
-# → http://localhost:5000
+# → http://localhost:5050
 ```
 
 **Frontend:**
@@ -127,7 +127,7 @@ npm run dev
 
 **Frontend** (`.env.local`):
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:5050
 ```
 
 <!-- pair extraordinaire -->

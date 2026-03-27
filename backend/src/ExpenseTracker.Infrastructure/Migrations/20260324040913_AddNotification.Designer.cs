@@ -21,7 +21,7 @@ namespace ExpenseTracker.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
@@ -189,33 +189,33 @@ namespace ExpenseTracker.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasDefaultValueSql("NEWID()");
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<string>("DeduplicationKey")
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
