@@ -159,14 +159,14 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Notification>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Id).HasDefaultValueSql("NEWID()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Type).HasConversion<int>().IsRequired();
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Message).IsRequired().HasMaxLength(1000);
             entity.Property(e => e.DeduplicationKey).HasMaxLength(200);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
 
-            // Index cho dedup lookup — nullable unique (SQL Server cho phép nhiều NULL)
+            // Index cho dedup lookup.
             entity.HasIndex(e => e.DeduplicationKey)
                   .HasDatabaseName("IX_Notification_DeduplicationKey");
         });
