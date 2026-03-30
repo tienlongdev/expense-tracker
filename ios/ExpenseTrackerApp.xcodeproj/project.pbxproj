@@ -1,0 +1,628 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		018927DE6DCA13C89D593ABF /* SavingsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3137FCA422904C22D291D5 /* SavingsDetailView.swift */; };
+		0370014CFAF5DE31BDA4E62B /* MonthYearPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8020C5A624A5E4D09CFC41 /* MonthYearPicker.swift */; };
+		0461C6CE9D7C7E15AC2E5BFD /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEA52657204495528048F61 /* Report.swift */; };
+		05A575215158871B1C1BC30B /* SavingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE533456828FD4AFBC365711 /* SavingsView.swift */; };
+		06769492B2FDD261D84C6346 /* DebtViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2030DB75FB99365488EDFCAA /* DebtViewModel.swift */; };
+		06FEFA816C62103E61C3C516 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74485C66403FBC984353554C /* LoadingView.swift */; };
+		17D17D25A7FE7F04157FBCEB /* DebtPaymentFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAB12E65E044C7B9FCCC6F3 /* DebtPaymentFormView.swift */; };
+		211C6AC73F613533AF2B22D9 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECAFAC1E5E46D53A3E32DA3C /* DashboardView.swift */; };
+		2CAD785CE10D97208B347183 /* TransactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADC7A04EA2F6A599CBF3AD0 /* TransactionsView.swift */; };
+		2CFE72F204999588A020A0B2 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661286E72D7CCDE3AB3F6B0D /* APIClient.swift */; };
+		3219C31E73E4C95234C08F83 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B69D1BED2DA25EED127B64 /* EmptyStateView.swift */; };
+		3845BEB0EF5DEF07B9169B12 /* TransactionFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 521814452799FBCD38315016 /* TransactionFormViewModel.swift */; };
+		3A6D4188110B63F4E43ADF81 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659B604AAE836017B411B8FB /* APIError.swift */; };
+		3D4BE4E1189087303CC64C8C /* AppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1BB948A691CDED99EA5CD7E /* AppNotification.swift */; };
+		451F695C6571D9D8A59C09AF /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20CA8932203DB12B3976083E /* Environment.swift */; };
+		4F18C65449FBED8BD45E347D /* CategoryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A6AE478491D43488556F91 /* CategoryFormView.swift */; };
+		50F25F1DA7DF4D2DADD19C13 /* TransactionCalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E922DA9F2CE52C6D4F3159 /* TransactionCalendarViewModel.swift */; };
+		59139133E4A7B7F791A968E8 /* ExpenseTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8E1DB50F738265989EA47D /* ExpenseTrackerApp.swift */; };
+		612E43FEB7A7DC23914A97BC /* SavingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3554954E97AB990A77391D68 /* SavingsViewModel.swift */; };
+		632B9EBEAEA8A64AB92AD770 /* SavingsActionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 700A804D8883B0D2B1899E3B /* SavingsActionView.swift */; };
+		6C05426FB389402AACEE62C8 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D261CAEB0AD7B71DA3676A8F /* CategoriesView.swift */; };
+		7163E0571D43E80A68F3FE92 /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942BCA621144E96E22A15707 /* BudgetView.swift */; };
+		72F3471D81106722360FE873 /* BudgetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E0ED9593A9D8C063592E08 /* BudgetViewModel.swift */; };
+		77272E941C6FB2A53A556C5B /* TransactionsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBF849F6FB5206F8F7EA3DF /* TransactionsViewModel.swift */; };
+		79757C9114F28494BE5AC6BB /* Budget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040752E9E5E1310ED437B931 /* Budget.swift */; };
+		802AE8AEFB3EFAB41FE40EE2 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0541CB364C0FE2986C1D251E /* NotificationsViewModel.swift */; };
+		91FD47C2DD12DA878B27E22F /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB0253165319C5D8D00C15C /* Category.swift */; };
+		949DE07156F77DE15613DB86 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C4064B27709C1D6106358D /* ReportsView.swift */; };
+		95A2C26604D8D3E04BEB0042 /* CategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5573B5E6B9965023D7706E8C /* CategoriesViewModel.swift */; };
+		97222BF66C2CAD08519C3C71 /* ReportsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4680933C44C5B52AA4FE38A6 /* ReportsViewModel.swift */; };
+		9AEFC3A52FE8CB304F1CA0A7 /* TransactionRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2ACA741694467EF00B09AB /* TransactionRowView.swift */; };
+		9E3848BB07178553F36A2588 /* Savings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0A847158BAC8545D0A8B7C /* Savings.swift */; };
+		A39DD3978B8A4AC2E747CB75 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FA61E0B3C09A1B10889AE2 /* AppState.swift */; };
+		A89E2A51AB3541E64DFDD518 /* DebtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1A5CDF36CE3F4F8E1B9369 /* DebtView.swift */; };
+		AAB8DE5882E9F0E6177ABB97 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0EAF7B792421BF8167E953 /* MoreView.swift */; };
+		AF224F4A44856203BF6164A8 /* TransactionCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEBD7551F475E8059F5BBA1F /* TransactionCalendarView.swift */; };
+		B23AFE62711F26A589C807AC /* SavingsAccountFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B933286B354A650A53B19B8B /* SavingsAccountFormView.swift */; };
+		B34B2BC8263988C87E155420 /* TransactionFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E5A74A4E0172ED76DA2FD4 /* TransactionFormView.swift */; };
+		B7368F5A80904DBD1DD73CC9 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0F039397BBEF375B02CA0E /* ErrorView.swift */; };
+		B86B0B9B11DCE7B1EF885E95 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 988392D254E4C616E9271A6A /* Transaction.swift */; };
+		BB54DCD984A283A7B73D2AE6 /* Debt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F889A6611A62845F1199F5C /* Debt.swift */; };
+		BE53227608362B3C162FD5EC /* DebtDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC867C17195B6104410A1006 /* DebtDetailView.swift */; };
+		C29082DE113A4BAC4FDC7044 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3AA257C226E212CFAA12B99 /* DashboardViewModel.swift */; };
+		CF6423571C494837B773D60E /* BarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32501DBC1A99069DB2567B57 /* BarChartView.swift */; };
+		E03890272B0E19FAECA9838C /* SummaryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA65531AC7DD92AFCEDA251 /* SummaryCardView.swift */; };
+		E7964868747A662746861B58 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265B582BE20F07D79F18084E /* MainTabView.swift */; };
+		EDE635CBE78A3DD450AA3454 /* BudgetFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC72E6BB6564A1A781BB7D5 /* BudgetFormView.swift */; };
+		F4661C1ADF65A13A747EF1EC /* DebtFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB7D103BE8F95629D666A38 /* DebtFormView.swift */; };
+		F6B7EA586982CFF4C4396CF1 /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761BFE515A877DF94F8F7B76 /* Formatters.swift */; };
+		FD19B3A6E69FED15913B0FB1 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF8ECC5778ACDD5A283005 /* NotificationsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		040752E9E5E1310ED437B931 /* Budget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Budget.swift; sourceTree = "<group>"; };
+		0541CB364C0FE2986C1D251E /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
+		18B69D1BED2DA25EED127B64 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		1B0A847158BAC8545D0A8B7C /* Savings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Savings.swift; sourceTree = "<group>"; };
+		2030DB75FB99365488EDFCAA /* DebtViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebtViewModel.swift; sourceTree = "<group>"; };
+		20CA8932203DB12B3976083E /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
+		265B582BE20F07D79F18084E /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		2E8020C5A624A5E4D09CFC41 /* MonthYearPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthYearPicker.swift; sourceTree = "<group>"; };
+		32501DBC1A99069DB2567B57 /* BarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarChartView.swift; sourceTree = "<group>"; };
+		3554954E97AB990A77391D68 /* SavingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsViewModel.swift; sourceTree = "<group>"; };
+		3F889A6611A62845F1199F5C /* Debt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debt.swift; sourceTree = "<group>"; };
+		4680933C44C5B52AA4FE38A6 /* ReportsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsViewModel.swift; sourceTree = "<group>"; };
+		521814452799FBCD38315016 /* TransactionFormViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFormViewModel.swift; sourceTree = "<group>"; };
+		5573B5E6B9965023D7706E8C /* CategoriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewModel.swift; sourceTree = "<group>"; };
+		5F2ACA741694467EF00B09AB /* TransactionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionRowView.swift; sourceTree = "<group>"; };
+		6412CBD603DA0AAD38A8593E /* ExpenseTrackerApp.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ExpenseTrackerApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		659B604AAE836017B411B8FB /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		661286E72D7CCDE3AB3F6B0D /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		6B1A5CDF36CE3F4F8E1B9369 /* DebtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebtView.swift; sourceTree = "<group>"; };
+		700A804D8883B0D2B1899E3B /* SavingsActionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsActionView.swift; sourceTree = "<group>"; };
+		74485C66403FBC984353554C /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		761BFE515A877DF94F8F7B76 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		7C0F039397BBEF375B02CA0E /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		81DF8ECC5778ACDD5A283005 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		84E0ED9593A9D8C063592E08 /* BudgetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewModel.swift; sourceTree = "<group>"; };
+		8AC72E6BB6564A1A781BB7D5 /* BudgetFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetFormView.swift; sourceTree = "<group>"; };
+		942BCA621144E96E22A15707 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
+		988392D254E4C616E9271A6A /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
+		9EEA52657204495528048F61 /* Report.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
+		A1BB948A691CDED99EA5CD7E /* AppNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotification.swift; sourceTree = "<group>"; };
+		A7A6AE478491D43488556F91 /* CategoryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryFormView.swift; sourceTree = "<group>"; };
+		A8C4064B27709C1D6106358D /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
+		B1E922DA9F2CE52C6D4F3159 /* TransactionCalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCalendarViewModel.swift; sourceTree = "<group>"; };
+		B933286B354A650A53B19B8B /* SavingsAccountFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsAccountFormView.swift; sourceTree = "<group>"; };
+		BBBF849F6FB5206F8F7EA3DF /* TransactionsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsViewModel.swift; sourceTree = "<group>"; };
+		BE8E1DB50F738265989EA47D /* ExpenseTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseTrackerApp.swift; sourceTree = "<group>"; };
+		C2FA61E0B3C09A1B10889AE2 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		D261CAEB0AD7B71DA3676A8F /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
+		D6E5A74A4E0172ED76DA2FD4 /* TransactionFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFormView.swift; sourceTree = "<group>"; };
+		DADC7A04EA2F6A599CBF3AD0 /* TransactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsView.swift; sourceTree = "<group>"; };
+		DEB7D103BE8F95629D666A38 /* DebtFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebtFormView.swift; sourceTree = "<group>"; };
+		DEBD7551F475E8059F5BBA1F /* TransactionCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCalendarView.swift; sourceTree = "<group>"; };
+		E3AA257C226E212CFAA12B99 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		EBA65531AC7DD92AFCEDA251 /* SummaryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryCardView.swift; sourceTree = "<group>"; };
+		EBB0253165319C5D8D00C15C /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		ECAFAC1E5E46D53A3E32DA3C /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		EE533456828FD4AFBC365711 /* SavingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsView.swift; sourceTree = "<group>"; };
+		EF0EAF7B792421BF8167E953 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		EF3137FCA422904C22D291D5 /* SavingsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavingsDetailView.swift; sourceTree = "<group>"; };
+		FBAB12E65E044C7B9FCCC6F3 /* DebtPaymentFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebtPaymentFormView.swift; sourceTree = "<group>"; };
+		FC867C17195B6104410A1006 /* DebtDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebtDetailView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0629137475434CEB2D53D9CC /* Reports */ = {
+			isa = PBXGroup;
+			children = (
+				A8C4064B27709C1D6106358D /* ReportsView.swift */,
+				4680933C44C5B52AA4FE38A6 /* ReportsViewModel.swift */,
+			);
+			path = Reports;
+			sourceTree = "<group>";
+		};
+		0B45FBCDA32D040FEE6B96E2 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				5A112201E6F8D3A8C16E332F /* Budget */,
+				E6E65856EDAB9F39D163CC29 /* Calendar */,
+				52D276960D099C2CC83C8F1D /* Categories */,
+				72FD824780568E3E18267C83 /* Dashboard */,
+				23ADC0C99668E6E7C490F378 /* Debt */,
+				E1751275807D2C66F027B48F /* More */,
+				64DFC59220377382CBD76F6B /* Notifications */,
+				0629137475434CEB2D53D9CC /* Reports */,
+				A85A928A6B58FED5B2FDA3C2 /* Savings */,
+				183BD41A15152B617DD351CF /* Transactions */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		183BD41A15152B617DD351CF /* Transactions */ = {
+			isa = PBXGroup;
+			children = (
+				D6E5A74A4E0172ED76DA2FD4 /* TransactionFormView.swift */,
+				521814452799FBCD38315016 /* TransactionFormViewModel.swift */,
+				5F2ACA741694467EF00B09AB /* TransactionRowView.swift */,
+				DADC7A04EA2F6A599CBF3AD0 /* TransactionsView.swift */,
+				BBBF849F6FB5206F8F7EA3DF /* TransactionsViewModel.swift */,
+			);
+			path = Transactions;
+			sourceTree = "<group>";
+		};
+		23ADC0C99668E6E7C490F378 /* Debt */ = {
+			isa = PBXGroup;
+			children = (
+				FC867C17195B6104410A1006 /* DebtDetailView.swift */,
+				DEB7D103BE8F95629D666A38 /* DebtFormView.swift */,
+				FBAB12E65E044C7B9FCCC6F3 /* DebtPaymentFormView.swift */,
+				6B1A5CDF36CE3F4F8E1B9369 /* DebtView.swift */,
+				2030DB75FB99365488EDFCAA /* DebtViewModel.swift */,
+			);
+			path = Debt;
+			sourceTree = "<group>";
+		};
+		44E7E2625446F3E26C227118 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				32501DBC1A99069DB2567B57 /* BarChartView.swift */,
+				18B69D1BED2DA25EED127B64 /* EmptyStateView.swift */,
+				7C0F039397BBEF375B02CA0E /* ErrorView.swift */,
+				74485C66403FBC984353554C /* LoadingView.swift */,
+				2E8020C5A624A5E4D09CFC41 /* MonthYearPicker.swift */,
+				EBA65531AC7DD92AFCEDA251 /* SummaryCardView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		48D2A4844D606DA61322ECF4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6412CBD603DA0AAD38A8593E /* ExpenseTrackerApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4B32B1840BA70759B57B978E = {
+			isa = PBXGroup;
+			children = (
+				5C1A181174DA20250AB9F69A /* ExpenseTrackerApp */,
+				48D2A4844D606DA61322ECF4 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		51F2284983110AA497920F41 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				661286E72D7CCDE3AB3F6B0D /* APIClient.swift */,
+				659B604AAE836017B411B8FB /* APIError.swift */,
+				20CA8932203DB12B3976083E /* Environment.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		52D276960D099C2CC83C8F1D /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				D261CAEB0AD7B71DA3676A8F /* CategoriesView.swift */,
+				5573B5E6B9965023D7706E8C /* CategoriesViewModel.swift */,
+				A7A6AE478491D43488556F91 /* CategoryFormView.swift */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+		5A112201E6F8D3A8C16E332F /* Budget */ = {
+			isa = PBXGroup;
+			children = (
+				8AC72E6BB6564A1A781BB7D5 /* BudgetFormView.swift */,
+				942BCA621144E96E22A15707 /* BudgetView.swift */,
+				84E0ED9593A9D8C063592E08 /* BudgetViewModel.swift */,
+			);
+			path = Budget;
+			sourceTree = "<group>";
+		};
+		5C1A181174DA20250AB9F69A /* ExpenseTrackerApp */ = {
+			isa = PBXGroup;
+			children = (
+				96C78A4721617CC131525B1E /* App */,
+				B6E450053C8A8D9DBC7CCA08 /* Core */,
+				0B45FBCDA32D040FEE6B96E2 /* Features */,
+				DF650E023CBA4FE46A07C8F1 /* Shared */,
+			);
+			path = ExpenseTrackerApp;
+			sourceTree = "<group>";
+		};
+		64DFC59220377382CBD76F6B /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				81DF8ECC5778ACDD5A283005 /* NotificationsView.swift */,
+				0541CB364C0FE2986C1D251E /* NotificationsViewModel.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
+		72FD824780568E3E18267C83 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				ECAFAC1E5E46D53A3E32DA3C /* DashboardView.swift */,
+				E3AA257C226E212CFAA12B99 /* DashboardViewModel.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		851BF81B7CDA0B7100472C90 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A1BB948A691CDED99EA5CD7E /* AppNotification.swift */,
+				040752E9E5E1310ED437B931 /* Budget.swift */,
+				EBB0253165319C5D8D00C15C /* Category.swift */,
+				3F889A6611A62845F1199F5C /* Debt.swift */,
+				9EEA52657204495528048F61 /* Report.swift */,
+				1B0A847158BAC8545D0A8B7C /* Savings.swift */,
+				988392D254E4C616E9271A6A /* Transaction.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		96C78A4721617CC131525B1E /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C2FA61E0B3C09A1B10889AE2 /* AppState.swift */,
+				BE8E1DB50F738265989EA47D /* ExpenseTrackerApp.swift */,
+				265B582BE20F07D79F18084E /* MainTabView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A85A928A6B58FED5B2FDA3C2 /* Savings */ = {
+			isa = PBXGroup;
+			children = (
+				B933286B354A650A53B19B8B /* SavingsAccountFormView.swift */,
+				700A804D8883B0D2B1899E3B /* SavingsActionView.swift */,
+				EF3137FCA422904C22D291D5 /* SavingsDetailView.swift */,
+				EE533456828FD4AFBC365711 /* SavingsView.swift */,
+				3554954E97AB990A77391D68 /* SavingsViewModel.swift */,
+			);
+			path = Savings;
+			sourceTree = "<group>";
+		};
+		B6E450053C8A8D9DBC7CCA08 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				51F2284983110AA497920F41 /* Networking */,
+				CB26D3273BA68C75656E9DEF /* Utilities */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		CB26D3273BA68C75656E9DEF /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				761BFE515A877DF94F8F7B76 /* Formatters.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		DF650E023CBA4FE46A07C8F1 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				44E7E2625446F3E26C227118 /* Components */,
+				851BF81B7CDA0B7100472C90 /* Models */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		E1751275807D2C66F027B48F /* More */ = {
+			isa = PBXGroup;
+			children = (
+				EF0EAF7B792421BF8167E953 /* MoreView.swift */,
+			);
+			path = More;
+			sourceTree = "<group>";
+		};
+		E6E65856EDAB9F39D163CC29 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				DEBD7551F475E8059F5BBA1F /* TransactionCalendarView.swift */,
+				B1E922DA9F2CE52C6D4F3159 /* TransactionCalendarViewModel.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C574F25640EDCA92707DE5F6 /* ExpenseTrackerApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 30C83D7A213E939A96121840 /* Build configuration list for PBXNativeTarget "ExpenseTrackerApp" */;
+			buildPhases = (
+				9090EB387F15853B6AF21E5E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ExpenseTrackerApp;
+			packageProductDependencies = (
+			);
+			productName = ExpenseTrackerApp;
+			productReference = 6412CBD603DA0AAD38A8593E /* ExpenseTrackerApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C59BF5901812F8CE160F084F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = EFB418DCF5111337695ABAF0 /* Build configuration list for PBXProject "ExpenseTrackerApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4B32B1840BA70759B57B978E;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 48D2A4844D606DA61322ECF4 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C574F25640EDCA92707DE5F6 /* ExpenseTrackerApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9090EB387F15853B6AF21E5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CFE72F204999588A020A0B2 /* APIClient.swift in Sources */,
+				3A6D4188110B63F4E43ADF81 /* APIError.swift in Sources */,
+				3D4BE4E1189087303CC64C8C /* AppNotification.swift in Sources */,
+				A39DD3978B8A4AC2E747CB75 /* AppState.swift in Sources */,
+				CF6423571C494837B773D60E /* BarChartView.swift in Sources */,
+				79757C9114F28494BE5AC6BB /* Budget.swift in Sources */,
+				EDE635CBE78A3DD450AA3454 /* BudgetFormView.swift in Sources */,
+				7163E0571D43E80A68F3FE92 /* BudgetView.swift in Sources */,
+				72F3471D81106722360FE873 /* BudgetViewModel.swift in Sources */,
+				6C05426FB389402AACEE62C8 /* CategoriesView.swift in Sources */,
+				95A2C26604D8D3E04BEB0042 /* CategoriesViewModel.swift in Sources */,
+				91FD47C2DD12DA878B27E22F /* Category.swift in Sources */,
+				4F18C65449FBED8BD45E347D /* CategoryFormView.swift in Sources */,
+				211C6AC73F613533AF2B22D9 /* DashboardView.swift in Sources */,
+				C29082DE113A4BAC4FDC7044 /* DashboardViewModel.swift in Sources */,
+				BB54DCD984A283A7B73D2AE6 /* Debt.swift in Sources */,
+				BE53227608362B3C162FD5EC /* DebtDetailView.swift in Sources */,
+				F4661C1ADF65A13A747EF1EC /* DebtFormView.swift in Sources */,
+				17D17D25A7FE7F04157FBCEB /* DebtPaymentFormView.swift in Sources */,
+				A89E2A51AB3541E64DFDD518 /* DebtView.swift in Sources */,
+				06769492B2FDD261D84C6346 /* DebtViewModel.swift in Sources */,
+				3219C31E73E4C95234C08F83 /* EmptyStateView.swift in Sources */,
+				451F695C6571D9D8A59C09AF /* Environment.swift in Sources */,
+				B7368F5A80904DBD1DD73CC9 /* ErrorView.swift in Sources */,
+				59139133E4A7B7F791A968E8 /* ExpenseTrackerApp.swift in Sources */,
+				F6B7EA586982CFF4C4396CF1 /* Formatters.swift in Sources */,
+				06FEFA816C62103E61C3C516 /* LoadingView.swift in Sources */,
+				E7964868747A662746861B58 /* MainTabView.swift in Sources */,
+				0370014CFAF5DE31BDA4E62B /* MonthYearPicker.swift in Sources */,
+				AAB8DE5882E9F0E6177ABB97 /* MoreView.swift in Sources */,
+				FD19B3A6E69FED15913B0FB1 /* NotificationsView.swift in Sources */,
+				802AE8AEFB3EFAB41FE40EE2 /* NotificationsViewModel.swift in Sources */,
+				0461C6CE9D7C7E15AC2E5BFD /* Report.swift in Sources */,
+				949DE07156F77DE15613DB86 /* ReportsView.swift in Sources */,
+				97222BF66C2CAD08519C3C71 /* ReportsViewModel.swift in Sources */,
+				9E3848BB07178553F36A2588 /* Savings.swift in Sources */,
+				B23AFE62711F26A589C807AC /* SavingsAccountFormView.swift in Sources */,
+				632B9EBEAEA8A64AB92AD770 /* SavingsActionView.swift in Sources */,
+				018927DE6DCA13C89D593ABF /* SavingsDetailView.swift in Sources */,
+				05A575215158871B1C1BC30B /* SavingsView.swift in Sources */,
+				612E43FEB7A7DC23914A97BC /* SavingsViewModel.swift in Sources */,
+				E03890272B0E19FAECA9838C /* SummaryCardView.swift in Sources */,
+				B86B0B9B11DCE7B1EF885E95 /* Transaction.swift in Sources */,
+				AF224F4A44856203BF6164A8 /* TransactionCalendarView.swift in Sources */,
+				50F25F1DA7DF4D2DADD19C13 /* TransactionCalendarViewModel.swift in Sources */,
+				B34B2BC8263988C87E155420 /* TransactionFormView.swift in Sources */,
+				3845BEB0EF5DEF07B9169B12 /* TransactionFormViewModel.swift in Sources */,
+				9AEFC3A52FE8CB304F1CA0A7 /* TransactionRowView.swift in Sources */,
+				2CAD785CE10D97208B347183 /* TransactionsView.swift in Sources */,
+				77272E941C6FB2A53A556C5B /* TransactionsViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8CF02D1C328C07D3E3E9CAEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		ADDA68097C7BD58A2EDB5ADF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Expense Tracker";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.expensetracker.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B3EC70820A708D760270CF52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C687F510295F8D978193332B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Expense Tracker";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.expensetracker.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		30C83D7A213E939A96121840 /* Build configuration list for PBXNativeTarget "ExpenseTrackerApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ADDA68097C7BD58A2EDB5ADF /* Debug */,
+				C687F510295F8D978193332B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EFB418DCF5111337695ABAF0 /* Build configuration list for PBXProject "ExpenseTrackerApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8CF02D1C328C07D3E3E9CAEB /* Debug */,
+				B3EC70820A708D760270CF52 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C59BF5901812F8CE160F084F /* Project object */;
+}
