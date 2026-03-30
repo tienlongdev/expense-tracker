@@ -1,18 +1,19 @@
 # 💰 Expense Tracker
 
-Personal Finance Management App built with **.NET 10** + **Next.js 15**.
+Personal Finance Management App built with **.NET 10** + **Next.js 16**.
 
 ---
 
-## 🏗️ Tech Stack
+## 🏗️ Tech Stack & Skills
 
-| Layer      | Technology                        |
-|------------|-----------------------------------|
-| Backend    | .NET 10, ASP.NET Core, EF Core    |
-| Database   | PostgreSQL 16                     |
-| Frontend   | Next.js 15, TypeScript            |
-| UI         | Tailwind CSS v4, shadcn/ui        |
-| Container  | Docker, Docker Compose            |
+| Layer | Stack | Skills/Kỹ thuật chính |
+|------|-------|------------------------|
+| Backend API | .NET 10, ASP.NET Core Web API, EF Core 10, Npgsql | Clean Architecture (API/Application/Domain/Infrastructure), Repository + Service pattern, Dependency Injection, OpenAPI, Quartz Scheduler (weekly summary job) |
+| Database | PostgreSQL 16 | Code-first migration với EF Core, seed dữ liệu khi khởi động |
+| Frontend Web | Next.js 16, React 19, TypeScript 5 | App Router, custom hooks cho data fetching/mutation, typed API layer (`src/lib/*-api.ts`) |
+| UI Web | Tailwind CSS v4, shadcn/ui, Radix UI, Lucide Icons | Component-based UI, CSS variables, reusable design primitives |
+| iOS App | Swift 5, SwiftUI (iOS 17+) | MVVM theo từng feature, async/await networking với `URLSession`, shared `APIClient` gọi chung backend API |
+| DevOps/Runtime | Docker, Docker Compose | Chạy đồng thời PostgreSQL + Backend + Frontend qua multi-service container |
 
 ---
 
