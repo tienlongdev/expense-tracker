@@ -12,7 +12,7 @@ extension Double {
         nf.numberStyle = .decimal
         nf.maximumFractionDigits = 0
         nf.minimumFractionDigits = 0
-        nf.groupingSeparator = ","
+        nf.groupingSeparator = "."
         nf.groupingSize = 3
         return nf.string(from: NSNumber(value: self)) ?? "\(Int(self))"
     }
@@ -95,6 +95,25 @@ extension String {
         let rf = RelativeDateTimeFormatter()
         rf.unitsStyle = .abbreviated
         return rf.localizedString(for: d, relativeTo: Date())
+    }
+
+    /// Extracts double from a numeric string, disregarding thousands separators
+    var rawAmount: Double {
+        let digits = self.filter { $0.isNumber }
+        return Double(digits) ?? 0
+    }
+
+    /// Formats as VND amount as user types
+    var formattedAmount: String {
+        let val = self.rawAmount
+        if val == 0 {
+            return self.isEmpty ? "" : "0"
+        }
+        let nf = NumberFormatter()
+        nf.numberStyle = .decimal
+        nf.maximumFractionDigits = 0
+        nf.groupingSeparator = "."
+        return nf.string(from: NSNumber(value: val)) ?? ""
     }
 }
 

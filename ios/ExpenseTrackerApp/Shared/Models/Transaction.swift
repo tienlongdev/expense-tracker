@@ -8,8 +8,8 @@ enum TransactionType: Int, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .income: return "Income"
-        case .expense: return "Expense"
+        case .income: return "Thu nhập"
+        case .expense: return "Chi tiêu"
         }
     }
 
@@ -31,8 +31,8 @@ struct Transaction: Codable, Identifiable {
     let typeName: String
     let categoryId: String
     let categoryName: String
-    let categoryIcon: String
-    let categoryColor: String
+    let categoryIcon: String?   // nullable from backend
+    let categoryColor: String?  // nullable from backend
     let date: String
     let note: String?
     let createdAt: String

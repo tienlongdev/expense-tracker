@@ -4,16 +4,21 @@ final class APIClient {
     static let shared = APIClient()
 
     private let session: URLSession
-    private let baseURL: URL
+    private let probeSession: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
+    private var cachedBaseURL: URL?
 
     private init() {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30
         config.timeoutIntervalForResource = 60
         session = URLSession(configuration: config)
-        baseURL = AppEnvironment.baseURL
+
+        let probeConfig = URLSessionConfiguration.ephemeral
+        probeConfig.timeoutIntervalForRequest = 2
+        probeConfig.timeoutIntervalForResource = 2
+        probeSession = URLSession(configuration: probeConfig)
 
         decoder = JSONDecoder()
         // Backend (ASP.NET Core) returns camelCase JSON — no keyDecodingStrategy needed
@@ -26,7 +31,7 @@ final class APIClient {
     // MARK: - Public Interface
 
     func get<T: Decodable>(_ path: String, queryItems: [URLQueryItem] = []) async throws -> T {
-        let request = try makeRequest(method: "GET", path: path, queryItems: queryItems)
+        let request = try await makeRequest(method: "GET", path: path, queryItems: queryItems)
         return try await perform(request)
     }
 
@@ -39,12 +44,12 @@ final class APIClient {
     }
 
     func patch(_ path: String) async throws {
-        let request = try makeRequest(method: "PATCH", path: path)
+        let request = try await makeRequest(method: "PATCH", path: path)
         try await performNoContent(request)
     }
 
     func delete(_ path: String) async throws {
-        let request = try makeRequest(method: "DELETE", path: path)
+        let request = try await makeRequest(method: "DELETE", path: path)
         try await performNoContent(request)
     }
 
@@ -55,7 +60,7 @@ final class APIClient {
         path: String,
         body: B
     ) async throws -> R {
-        var request = try makeRequest(method: method, path: path)
+        var request = try await makeRequest(method: method, path: path)
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try encoder.encode(body)
         return try await perform(request)
@@ -65,7 +70,8 @@ final class APIClient {
         method: String,
         path: String,
         queryItems: [URLQueryItem] = []
-    ) throws -> URLRequest {
+    ) async throws -> URLRequest {
+        let baseURL = try await resolveBaseURL()
         guard var components = URLComponents(
             url: baseURL.appendingPathComponent(path),
             resolvingAgainstBaseURL: false
@@ -81,6 +87,53 @@ final class APIClient {
         var request = URLRequest(url: url)
         request.httpMethod = method
         return request
+    }
+
+    private func resolveBaseURL() async throws -> URL {
+        if let cachedBaseURL {
+            return cachedBaseURL
+        }
+
+        if let configuredBaseURL = AppEnvironment.configuredBaseURL {
+            if AppEnvironment.requiresExplicitDeviceBaseURL,
+               AppEnvironment.isLoopbackHost(configuredBaseURL) {
+                throw APIError.configuration(AppEnvironment.deviceBaseURLHelp)
+            }
+
+            cachedBaseURL = configuredBaseURL
+            return configuredBaseURL
+        }
+
+        if AppEnvironment.requiresExplicitDeviceBaseURL {
+            throw APIError.configuration(AppEnvironment.deviceBaseURLHelp)
+        }
+
+        for candidate in AppEnvironment.baseURLCandidates {
+            if await canReachServer(at: candidate) {
+                cachedBaseURL = candidate
+                return candidate
+            }
+        }
+
+        let triedHosts = AppEnvironment.baseURLCandidates
+            .map(\.absoluteString)
+            .joined(separator: ", ")
+
+        throw APIError.configuration(
+            "Could not connect to the API. Tried \(triedHosts). Start the backend, or set API_BASE_URL in Info.plist."
+        )
+    }
+
+    private func canReachServer(at baseURL: URL) async -> Bool {
+        var request = URLRequest(url: baseURL)
+        request.httpMethod = "GET"
+
+        do {
+            let (_, response) = try await probeSession.data(for: request)
+            return response is HTTPURLResponse
+        } catch {
+            return false
+        }
     }
 
     private func perform<T: Decodable>(_ request: URLRequest) async throws -> T {

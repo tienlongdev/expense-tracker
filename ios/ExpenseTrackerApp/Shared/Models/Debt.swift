@@ -8,8 +8,8 @@ enum DebtType: Int, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .borrowed: return "Borrowed"
-        case .lent: return "Lent"
+        case .borrowed: return "Đang vay"
+        case .lent: return "Đã cho vay"
         }
     }
 }
@@ -21,9 +21,9 @@ enum DebtStatus: Int, Codable, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .unpaid: return "Unpaid"
-        case .partiallyPaid: return "Partially Paid"
-        case .paid: return "Paid"
+        case .unpaid: return "Chưa thanh toán"
+        case .partiallyPaid: return "Thanh toán một phần"
+        case .paid: return "Đã thanh toán"
         }
     }
 }

@@ -2,6 +2,7 @@ import Foundation
 
 enum APIError: LocalizedError {
     case invalidURL
+    case configuration(String)
     case requestFailed(statusCode: Int, message: String)
     case decodingFailed(Error)
     case unknown(Error)
@@ -10,6 +11,8 @@ enum APIError: LocalizedError {
         switch self {
         case .invalidURL:
             return "Invalid request URL."
+        case .configuration(let message):
+            return message
         case .requestFailed(let code, let message):
             return "Server error (\(code)): \(message)"
         case .decodingFailed(let error):

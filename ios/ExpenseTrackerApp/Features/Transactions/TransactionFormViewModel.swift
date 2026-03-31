@@ -26,7 +26,7 @@ final class TransactionFormViewModel: ObservableObject {
 
         if let tx = transaction {
             self.title = tx.title
-            self.amount = tx.amount == 0 ? "" : "\(Int(tx.amount))"
+            self.amount = tx.amount == 0 ? "" : tx.amount.formatted
             self.selectedType = tx.type
             self.selectedCategoryId = tx.categoryId
             self.date = tx.date.asDate ?? Date()
@@ -38,10 +38,14 @@ final class TransactionFormViewModel: ObservableObject {
         categories.filter { $0.type == selectedType }
     }
 
+    private var hasValidSelectedCategory: Bool {
+        filteredCategories.contains { $0.id == selectedCategoryId }
+    }
+
     var canSave: Bool {
         !title.trimmingCharacters(in: .whitespaces).isEmpty
-        && (Double(amount) ?? 0) > 0
-        && !selectedCategoryId.isEmpty
+        && amount.rawAmount > 0
+        && hasValidSelectedCategory
     }
 
     // MARK: - Load categories
@@ -51,8 +55,8 @@ final class TransactionFormViewModel: ObservableObject {
         do {
             let all: [Category] = try await client.get("/api/category")
             categories = all
-            // Auto-select first matching category if none selected
-            if selectedCategoryId.isEmpty, let first = filteredCategories.first {
+            // Keep selection only if it still exists in the filtered set.
+            if !hasValidSelectedCategory, let first = filteredCategories.first {
                 selectedCategoryId = first.id
             }
         } catch {
@@ -65,7 +69,18 @@ final class TransactionFormViewModel: ObservableObject {
 
     func save() async -> Bool {
         guard canSave else { return false }
-        guard let amountValue = Double(amount) else { return false }
+        let amountValue = amount.rawAmount
+        guard amountValue > 0 else { return false }
+
+        guard UUID(uuidString: selectedCategoryId) != nil else {
+            error = "Please select a valid category."
+            return false
+        }
+
+        guard hasValidSelectedCategory else {
+            error = "Selected category is no longer available for this transaction type."
+            return false
+        }
 
         isSaving = true
         error = nil
@@ -92,6 +107,24 @@ final class TransactionFormViewModel: ObservableObject {
                 )
                 let _: Transaction = try await client.post("/api/transaction", body: body)
             }
+            onSave()
+            isSaving = false
+            return true
+        } catch {
+            self.error = error.localizedDescription
+            isSaving = false
+            return false
+        }
+    }
+
+    // MARK: - Delete
+
+    func delete() async -> Bool {
+        guard let tx = transaction else { return false }
+        isSaving = true
+        error = nil
+        do {
+            try await client.delete("/api/transaction/\(tx.id)")
             onSave()
             isSaving = false
             return true

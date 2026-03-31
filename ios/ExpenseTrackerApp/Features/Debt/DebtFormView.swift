@@ -10,19 +10,25 @@ struct DebtFormView: View {
 
     var body: some View {
         Form {
-            Section("Info") {
-                TextField("Title", text: $vm.title).autocorrectionDisabled()
-                TextField("Person / Lender / Borrower", text: $vm.personName).autocorrectionDisabled()
+            Section("Thông tin") {
+                TextField("Tên khoản nợ", text: $vm.title).autocorrectionDisabled()
+                TextField("Người vay / cho vay", text: $vm.personName).autocorrectionDisabled()
             }
 
             if !vm.isEditing {
-                Section("Amount & Type") {
+                Section("Số tiền & Loại") {
                     HStack {
-                        TextField("Amount", text: $vm.amount)
+                        TextField("Số tiền", text: $vm.amount)
                             .keyboardType(.decimalPad)
+                            .onChange(of: vm.amount) { _, newValue in
+                                let formatted = newValue.formattedAmount
+                                if vm.amount != formatted {
+                                    vm.amount = formatted
+                                }
+                            }
                         Text("₫").foregroundStyle(.secondary)
                     }
-                    Picker("Type", selection: $vm.selectedType) {
+                    Picker("Loại", selection: $vm.selectedType) {
                         ForEach(DebtType.allCases, id: \.self) { t in
                             Text(t.displayName).tag(t)
                         }
@@ -31,15 +37,15 @@ struct DebtFormView: View {
                 }
             }
 
-            Section("Due Date (optional)") {
-                Toggle("Has due date", isOn: $vm.hasDueDate)
+            Section("Hạn thanh toán (tuỳ chọn)") {
+                Toggle("Có ngày hạn", isOn: $vm.hasDueDate)
                 if vm.hasDueDate {
-                    DatePicker("Due Date", selection: $vm.dueDate, displayedComponents: .date)
+                    DatePicker("Ngày hạn", selection: $vm.dueDate, displayedComponents: .date)
                 }
             }
 
-            Section("Note (optional)") {
-                TextField("Note...", text: $vm.note, axis: .vertical)
+            Section("Ghi chú (tuỳ chọn)") {
+                TextField("Thêm ghi chú...", text: $vm.note, axis: .vertical)
                     .lineLimit(3, reservesSpace: true)
             }
 
@@ -47,17 +53,24 @@ struct DebtFormView: View {
                 Section { Text(error).foregroundStyle(.red).font(.footnote) }
             }
         }
-        .navigationTitle(vm.isEditing ? "Edit Debt" : "New Debt")
+        .scrollContentBackground(.hidden)
+        .navigationTitle(vm.isEditing ? "Sửa khoản nợ" : "Khoản nợ mới")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Color.cardBackground, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) { Button("Cancel") { dismiss() } }
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Huỷ") { dismiss() }
+                    .foregroundStyle(Color.textSecondary)
+            }
             ToolbarItem(placement: .topBarTrailing) {
-                if vm.isSaving { ProgressView() }
+                if vm.isSaving { ProgressView().tint(Color.accentPurple) }
                 else {
-                    Button("Save") {
+                    Button("Lưu") {
                         Task { if await vm.save() { dismiss() } }
                     }
                     .fontWeight(.semibold)
+                    .foregroundStyle(Color.accentPurple)
                     .disabled(!vm.canSave)
                 }
             }
@@ -104,7 +117,11 @@ final class DebtFormViewModel: ObservableObject {
     var canSave: Bool {
         !title.trimmingCharacters(in: .whitespaces).isEmpty
         && !personName.trimmingCharacters(in: .whitespaces).isEmpty
-        && (isEditing || (Double(amount) ?? 0) > 0)
+        && (isEditing || vmAmountIsPositive)
+    }
+
+    private var vmAmountIsPositive: Bool {
+        amount.rawAmount > 0
     }
 
     func save() async -> Bool {
@@ -121,8 +138,9 @@ final class DebtFormViewModel: ObservableObject {
                 )
                 let _: Debt = try await client.put("/api/debt/\(d.id)", body: body)
             } else {
-                guard let amt = Double(amount), amt > 0 else {
-                    error = "Please enter a valid amount."
+                let amt = amount.rawAmount
+                guard amt > 0 else {
+                    error = "Vui lòng nhập số tiền hợp lệ."
                     isSaving = false
                     return false
                 }

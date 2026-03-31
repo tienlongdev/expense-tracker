@@ -8,16 +8,23 @@ struct BudgetView: View {
     @State private var showCopyConfirm = false
 
     var body: some View {
-        Group {
-            if viewModel.isLoading && viewModel.overview == nil {
-                LoadingView()
-            } else if let error = viewModel.error, viewModel.overview == nil {
-                ErrorView(message: error, onRetry: { Task { await viewModel.load() } })
-            } else {
-                listContent
+        ZStack {
+            Color.appBackground.ignoresSafeArea()
+
+            Group {
+                if viewModel.isLoading && viewModel.overview == nil {
+                    LoadingView()
+                } else if let error = viewModel.error, viewModel.overview == nil {
+                    ErrorView(message: error, onRetry: { Task { await viewModel.load() } })
+                } else {
+                    listContent
+                }
             }
         }
-        .navigationTitle("Budget")
+        .navigationTitle("Ngân sách")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(Color.appBackground, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar { toolbarContent }
         .sheet(isPresented: $showCreateForm) {
             NavigationStack {
@@ -34,14 +41,14 @@ struct BudgetView: View {
             }
         }
         .confirmationDialog(
-            "Copy budgets from previous month?",
+            "Sao chép ngân sách từ tháng trước?",
             isPresented: $showCopyConfirm,
             titleVisibility: .visible
         ) {
-            Button("Copy (skip existing)") {
+            Button("Sao chép (bỏ qua mục đã có)") {
                 Task { await viewModel.copyFromPreviousMonth() }
             }
-            Button("Cancel", role: .cancel) {}
+            Button("Huỷ", role: .cancel) {}
         }
         .task { await viewModel.load() }
         .refreshable { await viewModel.load() }
@@ -54,13 +61,14 @@ struct BudgetView: View {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
                 Button(action: { showCreateForm = true }) {
-                    Label("Add Budget", systemImage: "plus")
+                    Label("Thêm ngân sách", systemImage: "plus")
                 }
                 Button(action: { showCopyConfirm = true }) {
-                    Label("Copy from Previous Month", systemImage: "doc.on.doc")
+                    Label("Sao chép từ tháng trước", systemImage: "doc.on.doc")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")
+                    .foregroundStyle(Color.textSecondary)
             }
         }
     }
@@ -68,91 +76,112 @@ struct BudgetView: View {
     // MARK: - Content
 
     private var listContent: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(alignment: .leading, spacing: 20) {
-                // Month picker
-                HStack {
-                    MonthYearPicker(year: $viewModel.year, month: $viewModel.month)
-                        .onChange(of: viewModel.month) { _, _ in Task { await viewModel.load() } }
-                        .onChange(of: viewModel.year) { _, _ in Task { await viewModel.load() } }
-                    Spacer()
-                }
-                .padding(.horizontal)
+                MonthYearPicker(year: $viewModel.year, month: $viewModel.month)
+                    .onChange(of: viewModel.month) { _, _ in Task { await viewModel.load() } }
+                    .onChange(of: viewModel.year) { _, _ in Task { await viewModel.load() } }
 
                 if let ov = viewModel.overview {
-                    // Summary cards
                     summaryCards(ov)
-                        .padding(.horizontal)
-
-                    // Category list
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Categories")
-                            .font(.headline)
-                            .padding(.horizontal)
-
-                        if ov.categories.isEmpty {
-                            EmptyStateView(
-                                icon: "chart.bar",
-                                title: "No Budgets",
-                                subtitle: "Tap + to set a budget for a category.",
-                                actionTitle: "Add Budget",
-                                action: { showCreateForm = true }
-                            )
-                        } else {
-                            ForEach(ov.categories) { item in
-                                BudgetCategoryRow(
-                                    item: item,
-                                    onEdit: {
-                                        guard let bid = item.budgetId else { return }
-                                        Task {
-                                            if let r = await viewModel.fetchBudgetRecord(budgetId: bid) {
-                                                editingRecord = r
-                                            }
-                                        }
-                                    },
-                                    onDelete: {
-                                        guard let bid = item.budgetId else { return }
-                                        Task { await viewModel.deleteBudget(id: bid) }
-                                    }
-                                )
-                                .padding(.horizontal)
-                                Divider().padding(.leading)
-                            }
-                        }
-                    }
+                    categoryList(ov)
                 }
 
                 if let error = viewModel.error {
-                    Text(error)
-                        .foregroundStyle(.red)
-                        .font(.footnote)
-                        .padding(.horizontal)
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                        Text(error).font(.footnote)
+                    }
+                    .foregroundStyle(.red)
+                    .padding(12)
+                    .background(Color.red.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
                 }
             }
-            .padding(.vertical)
+            .padding(16)
         }
     }
 
     private func summaryCards(_ ov: BudgetOverview) -> some View {
-        LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
-            SummaryCardView(title: "Planned", amount: ov.totalPlanned, icon: "target", tint: .blue)
-            SummaryCardView(title: "Spent", amount: ov.totalSpent, icon: "arrow.up.circle.fill", tint: .red)
-            SummaryCardView(title: "Remaining", amount: ov.totalRemaining, icon: "checkmark.circle.fill", tint: .green)
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 4) {
-                    Circle().fill(.red).frame(width: 8, height: 8)
-                    Text("Over: \(ov.overBudgetCount)").font(.caption)
-                    Circle().fill(.orange).frame(width: 8, height: 8)
-                    Text("Near: \(ov.nearLimitCount)").font(.caption)
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                GradientSummaryCard(
+                    title: "Kế hoạch",
+                    amount: ov.totalPlanned,
+                    icon: "target",
+                    gradient: AppGradient.balance
+                )
+                GradientSummaryCard(
+                    title: "Đã chi",
+                    amount: ov.totalSpent,
+                    icon: "arrow.up.circle.fill",
+                    gradient: AppGradient.expense
+                )
+            }
+
+            HStack(spacing: 12) {
+                GradientSummaryCard(
+                    title: "Còn lại",
+                    amount: ov.totalRemaining,
+                    icon: "checkmark.circle.fill",
+                    gradient: AppGradient.income
+                )
+
+                // Status summary card
+                VStack(alignment: .leading, spacing: 8) {
+                    statusRow(count: ov.overBudgetCount, label: "Vượt ngân sách", color: Color.expenseRed)
+                    statusRow(count: ov.nearLimitCount, label: "Gần giới hạn", color: .orange)
+                    statusRow(count: ov.onTrackCount, label: "Ổn định", color: Color.incomeGreen)
                 }
-                HStack(spacing: 4) {
-                    Circle().fill(.green).frame(width: 8, height: 8)
-                    Text("OK: \(ov.onTrackCount)").font(.caption)
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .glassCard()
+            }
+        }
+    }
+
+    private func statusRow(count: Int, label: String, color: Color) -> some View {
+        HStack(spacing: 6) {
+            Circle().fill(color).frame(width: 7, height: 7)
+            Text("\(count) \(label)")
+                .font(.caption)
+                .foregroundStyle(Color.textSecondary)
+        }
+    }
+
+    private func categoryList(_ ov: BudgetOverview) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "Danh mục", action: { showCreateForm = true }, actionTitle: "+ Thêm")
+
+            if ov.categories.isEmpty {
+                MinimalEmptyState(
+                    icon: "chart.bar",
+                    title: "Chưa có ngân sách",
+                    subtitle: "Thiết lập ngân sách cho từng danh mục",
+                    actionTitle: "Thêm ngân sách",
+                    action: { showCreateForm = true }
+                )
+                .glassCard()
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(ov.categories) { item in
+                        BudgetCategoryRow(
+                            item: item,
+                            onEdit: {
+                                guard let bid = item.budgetId else { return }
+                                Task {
+                                    if let r = await viewModel.fetchBudgetRecord(budgetId: bid) {
+                                        editingRecord = r
+                                    }
+                                }
+                            },
+                            onDelete: {
+                                guard let bid = item.budgetId else { return }
+                                Task { await viewModel.deleteBudget(id: bid) }
+                            }
+                        )
+                    }
                 }
             }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
         }
     }
 }
@@ -166,21 +195,47 @@ private struct BudgetCategoryRow: View {
     @State private var showDeleteConfirm = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                if let icon = item.categoryIcon { Text(icon) }
-                Text(item.categoryName)
-                    .font(.subheadline.weight(.medium))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                // Category icon
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Color(hex: item.categoryColor ?? "#888888").opacity(0.18))
+                        .frame(width: 38, height: 38)
+                    Text(item.categoryIcon ?? "📦")
+                        .font(.system(size: 18))
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(item.categoryName)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.textPrimary)
+                    if item.hasBudget {
+                        Text("\(item.spentAmount.currency) / \(item.plannedAmount.currency)")
+                            .font(.caption)
+                            .foregroundStyle(Color.textTertiary)
+                    } else {
+                        Text("Chưa đặt ngân sách")
+                            .font(.caption)
+                            .foregroundStyle(Color.textTertiary)
+                    }
+                }
+
                 Spacer()
-                statusBadge
+
+                if item.hasBudget {
+                    statusBadge
+                }
+
                 Menu {
                     if item.hasBudget {
-                        Button("Edit", action: onEdit)
-                        Button("Delete", role: .destructive) { showDeleteConfirm = true }
+                        Button("Sửa", action: onEdit)
+                        Button("Xoá", role: .destructive) { showDeleteConfirm = true }
                     }
                 } label: {
                     Image(systemName: "ellipsis")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.textTertiary)
+                        .padding(6)
                 }
             }
 
@@ -190,37 +245,39 @@ private struct BudgetCategoryRow: View {
                     isOverBudget: item.isOverBudget,
                     isNearLimit: item.isNearLimit
                 )
-
                 HStack {
-                    Text("Spent: \(item.spentAmount.currency)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text("\(Int(item.usedPercent))% đã dùng")
+                        .font(.caption2)
+                        .foregroundStyle(Color.textTertiary)
                     Spacer()
-                    Text("of \(item.plannedAmount.currency)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    Text("Còn \(item.remainingAmount.currency)")
+                        .font(.caption2)
+                        .foregroundStyle(item.isOverBudget ? Color.expenseRed : Color.incomeGreen)
                 }
-            } else {
-                Text("No budget set")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
             }
         }
-        .padding(.vertical, 6)
-        .confirmationDialog("Delete budget for \(item.categoryName)?", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
-            Button("Delete", role: .destructive, action: onDelete)
-            Button("Cancel", role: .cancel) {}
+        .padding(14)
+        .glassCard()
+        .confirmationDialog("Xoá ngân sách cho \(item.categoryName)?", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
+            Button("Xoá", role: .destructive, action: onDelete)
+            Button("Huỷ", role: .cancel) {}
         }
     }
 
     private var statusBadge: some View {
         Group {
             if item.isOverBudget {
-                Text("Over").font(.caption2).padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(.red.opacity(0.15), in: Capsule()).foregroundStyle(.red)
+                Text("Vượt")
+                    .font(.caption2.weight(.semibold))
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(Color.expenseRed.opacity(0.15), in: Capsule())
+                    .foregroundStyle(Color.expenseRed)
             } else if item.isNearLimit {
-                Text("Near limit").font(.caption2).padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(.orange.opacity(0.15), in: Capsule()).foregroundStyle(.orange)
+                Text("Sắp hết")
+                    .font(.caption2.weight(.semibold))
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(Color.orange.opacity(0.15), in: Capsule())
+                    .foregroundStyle(.orange)
             }
         }
     }

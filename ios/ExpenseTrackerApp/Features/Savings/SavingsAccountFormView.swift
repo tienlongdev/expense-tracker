@@ -24,6 +24,12 @@ struct SavingsAccountFormView: View {
                     HStack {
                         TextField("Amount", text: $vm.initialAmount)
                             .keyboardType(.decimalPad)
+                            .onChange(of: vm.initialAmount) { _, newValue in
+                                let formatted = newValue.formattedAmount
+                                if vm.initialAmount != formatted {
+                                    vm.initialAmount = formatted
+                                }
+                            }
                         Text("₫").foregroundStyle(.secondary)
                     }
                 }
@@ -110,8 +116,9 @@ final class SavingsAccountFormViewModel: ObservableObject {
     }
 
     var canSave: Bool {
-        !name.trimmingCharacters(in: .whitespaces).isEmpty
-        && (isEditing || (Double(initialAmount) ?? 0) > 0)
+        let amt = initialAmount.rawAmount
+        return !name.trimmingCharacters(in: .whitespaces).isEmpty
+            && (isEditing || amt > 0)
     }
 
     func save() async -> Bool {
@@ -129,7 +136,8 @@ final class SavingsAccountFormViewModel: ObservableObject {
                 )
                 let _: SavingsAccount = try await client.put("/api/savings/\(a.id)", body: body)
             } else {
-                guard let amt = Double(initialAmount), amt > 0 else {
+                let amt = initialAmount.rawAmount
+                guard amt > 0 else {
                     error = "Please enter a valid initial amount."
                     isSaving = false; return false
                 }

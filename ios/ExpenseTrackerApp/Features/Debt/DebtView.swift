@@ -8,19 +8,34 @@ struct DebtView: View {
     @State private var selectedDebt: Debt? = nil
 
     var body: some View {
-        Group {
-            if viewModel.isLoading && viewModel.allDebts.isEmpty {
-                LoadingView()
-            } else if let error = viewModel.error, viewModel.allDebts.isEmpty {
-                ErrorView(message: error, onRetry: { Task { await viewModel.load() } })
-            } else {
-                mainContent
+        ZStack {
+            Color.appBackground.ignoresSafeArea()
+
+            Group {
+                if viewModel.isLoading && viewModel.allDebts.isEmpty {
+                    LoadingView()
+                } else if let error = viewModel.error, viewModel.allDebts.isEmpty {
+                    ErrorView(message: error, onRetry: { Task { await viewModel.load() } })
+                } else {
+                    mainContent
+                }
             }
         }
-        .navigationTitle("Debt")
+        .navigationTitle("Quản lý nợ")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(Color.appBackground, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button { showCreateForm = true } label: { Image(systemName: "plus") }
+                Button {
+                    showCreateForm = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(8)
+                        .background(AppGradient.primary, in: Circle())
+                }
             }
         }
         .sheet(isPresented: $showCreateForm) {
@@ -43,121 +58,173 @@ struct DebtView: View {
     }
 
     private var mainContent: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
                 if let s = viewModel.summary { summaryCards(s) }
 
-                Picker("Filter", selection: $viewModel.selectedTab) {
+                // Filter tabs
+                HStack(spacing: 0) {
                     ForEach(DebtViewModel.DebtTab.allCases) { tab in
-                        Text(tab.rawValue).tag(tab)
+                        let isSelected = viewModel.selectedTab == tab
+                        Button {
+                            withAnimation(.spring(response: 0.3)) {
+                                viewModel.selectedTab = tab
+                            }
+                        } label: {
+                            Text(tab.rawValue)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(isSelected ? .white : Color.textTertiary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background {
+                                    if isSelected {
+                                        Capsule().fill(AppGradient.primary).padding(4)
+                                    }
+                                }
+                        }
                     }
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
+                .background(Color.surfaceColor, in: RoundedRectangle(cornerRadius: 14))
 
                 if viewModel.displayedDebts.isEmpty {
-                    EmptyStateView(
+                    MinimalEmptyState(
                         icon: "creditcard",
-                        title: "No Debts",
-                        subtitle: viewModel.selectedTab == .all ? "Tap + to add a debt record." : "No debts in this category.",
-                        actionTitle: viewModel.selectedTab == .all ? "Add Debt" : nil,
+                        title: "Chưa có khoản nợ",
+                        subtitle: viewModel.selectedTab == .all
+                            ? "Nhấn + để thêm khoản nợ mới"
+                            : "Không có khoản nợ trong danh mục này",
+                        actionTitle: viewModel.selectedTab == .all ? "Thêm khoản nợ" : nil,
                         action: viewModel.selectedTab == .all ? { showCreateForm = true } : nil
                     )
+                    .glassCard()
                 } else {
-                    LazyVStack(spacing: 0) {
+                    VStack(spacing: 8) {
                         ForEach(viewModel.displayedDebts) { debt in
                             DebtRowView(debt: debt)
                                 .contentShape(Rectangle())
                                 .onTapGesture { selectedDebt = debt }
                                 .contextMenu {
-                                    Button("Edit") { editingDebt = debt }
+                                    Button("Sửa") { editingDebt = debt }
                                     if debt.status == .unpaid {
-                                        Button("Delete", role: .destructive) {
+                                        Button("Xoá", role: .destructive) {
                                             Task { await viewModel.delete(id: debt.id) }
                                         }
                                     }
                                 }
-                            Divider().padding(.leading)
                         }
                     }
-                    .padding(.horizontal)
                 }
             }
-            .padding(.vertical)
+            .padding(16)
         }
     }
 
     private func summaryCards(_ s: DebtSummary) -> some View {
-        LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
-            SummaryCardView(title: "Borrowed", amount: s.totalBorrowed, icon: "arrow.down.circle.fill", tint: .red,
-                            subtitle: "Remaining: \(s.totalBorrowedRemaining.currency)")
-            SummaryCardView(title: "Lent", amount: s.totalLent, icon: "arrow.up.circle.fill", tint: .green,
-                            subtitle: "Remaining: \(s.totalLentRemaining.currency)")
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                GradientSummaryCard(
+                    title: "Đang vay",
+                    amount: s.totalBorrowed,
+                    icon: "arrow.down.circle.fill",
+                    gradient: AppGradient.expense
+                )
+                GradientSummaryCard(
+                    title: "Đã cho vay",
+                    amount: s.totalLent,
+                    icon: "arrow.up.circle.fill",
+                    gradient: AppGradient.income
+                )
+            }
+
             if s.overdueCount > 0 {
-                HStack {
-                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                    Text("\(s.overdueCount) overdue debt\(s.overdueCount == 1 ? "" : "s")")
-                        .font(.subheadline.bold())
+                HStack(spacing: 10) {
+                    Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
+                    Text("\(s.overdueCount) khoản nợ quá hạn")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.orange)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.orange.opacity(0.6))
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(14)
-                .background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 14))
-                .gridCellColumns(2)
+                .background(Color.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.orange.opacity(0.3), lineWidth: 0.5)
+                )
             }
         }
-        .padding(.horizontal)
     }
 }
 
-// MARK: - Row
+// MARK: - Debt Row
 
 private struct DebtRowView: View {
     let debt: Debt
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: debt.type == .borrowed ? "arrow.down.circle.fill" : "arrow.up.circle.fill")
-                .font(.title2)
-                .foregroundStyle(debt.type == .borrowed ? .red : .green)
-                .frame(width: 44)
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(typeColor.opacity(0.15))
+                    .frame(width: 44, height: 44)
+                Image(systemName: debt.type == .borrowed
+                      ? "arrow.down.circle.fill"
+                      : "arrow.up.circle.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(typeColor)
+            }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(debt.title)
-                    .font(.subheadline.weight(.medium))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.textPrimary)
+                    .lineLimit(1)
                 Text(debt.personName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Color.textSecondary)
                 if let due = debt.dueDate?.displayDate {
-                    HStack(spacing: 3) {
+                    HStack(spacing: 4) {
                         if debt.isOverdue {
-                            Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.orange)
+                            Image(systemName: "exclamationmark.circle.fill")
+                                .font(.caption2)
+                                .foregroundStyle(.orange)
                         }
-                        Text("Due: \(due)").font(.caption2).foregroundStyle(debt.isOverdue ? .orange : .tertiary)
+                        Text("Hạn: \(due)")
+                            .font(.caption2)
+                            .foregroundStyle(debt.isOverdue ? .orange : Color.textTertiary)
                     }
                 }
             }
 
             Spacer()
 
-            VStack(alignment: .trailing, spacing: 3) {
+            VStack(alignment: .trailing, spacing: 4) {
                 Text(debt.remainingAmount.currency)
                     .font(.subheadline.bold())
+                    .foregroundStyle(Color.textPrimary)
                 Text(debt.statusName)
-                    .font(.caption2)
-                    .padding(.horizontal, 6).padding(.vertical, 2)
+                    .font(.caption2.weight(.semibold))
+                    .padding(.horizontal, 8).padding(.vertical, 3)
                     .background(statusColor(debt.status).opacity(0.15), in: Capsule())
                     .foregroundStyle(statusColor(debt.status))
             }
         }
-        .padding(.vertical, 10)
+        .padding(14)
+        .glassCard()
+    }
+
+    private var typeColor: Color {
+        debt.type == .borrowed ? Color.expenseRed : Color.incomeGreen
     }
 
     private func statusColor(_ s: DebtStatus) -> Color {
         switch s {
-        case .unpaid: return .red
+        case .unpaid: return Color.expenseRed
         case .partiallyPaid: return .orange
-        case .paid: return .green
+        case .paid: return Color.incomeGreen
         }
     }
 }

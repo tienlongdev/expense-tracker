@@ -6,21 +6,27 @@ struct TransactionsView: View {
     @State private var showCreateForm = false
     @State private var editingTransaction: Transaction? = nil
     @State private var showFilters = false
-    @State private var deletingId: String? = nil
 
     var body: some View {
-        Group {
-            if viewModel.isLoading && viewModel.transactions.isEmpty {
-                LoadingView()
-            } else if let error = viewModel.error, viewModel.transactions.isEmpty {
-                ErrorView(message: error, onRetry: {
-                    Task { await viewModel.load() }
-                })
-            } else {
-                listContent
+        ZStack {
+            Color.appBackground.ignoresSafeArea()
+
+            Group {
+                if viewModel.isLoading && viewModel.transactions.isEmpty {
+                    loadingView
+                } else if let error = viewModel.error, viewModel.transactions.isEmpty {
+                    ErrorView(message: error, onRetry: {
+                        Task { await viewModel.load() }
+                    })
+                } else {
+                    listContent
+                }
             }
         }
-        .navigationTitle("Transactions")
+        .navigationTitle("Giao dịch")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbarBackground(Color.appBackground, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar { toolbarContent }
         .sheet(isPresented: $showCreateForm) {
             NavigationStack {
@@ -43,6 +49,19 @@ struct TransactionsView: View {
         .refreshable { await viewModel.load() }
     }
 
+    // MARK: - Loading
+
+    private var loadingView: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .tint(Color.accentPurple)
+                .scaleEffect(1.2)
+            Text("Đang tải...")
+                .font(.subheadline)
+                .foregroundStyle(Color.textSecondary)
+        }
+    }
+
     // MARK: - Toolbar
 
     @ToolbarContentBuilder
@@ -51,7 +70,16 @@ struct TransactionsView: View {
             Button {
                 showFilters = true
             } label: {
-                Image(systemName: viewModel.isFiltered ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+                HStack(spacing: 4) {
+                    Image(systemName: viewModel.isFiltered
+                          ? "line.3.horizontal.decrease.circle.fill"
+                          : "line.3.horizontal.decrease.circle")
+                    if viewModel.isFiltered {
+                        Text("Lọc")
+                            .font(.caption.weight(.semibold))
+                    }
+                }
+                .foregroundStyle(viewModel.isFiltered ? Color.accentPurple : Color.textSecondary)
             }
         }
         ToolbarItem(placement: .topBarTrailing) {
@@ -59,6 +87,10 @@ struct TransactionsView: View {
                 showCreateForm = true
             } label: {
                 Image(systemName: "plus")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
+                    .padding(8)
+                    .background(AppGradient.primary, in: Circle())
             }
         }
     }
@@ -66,127 +98,161 @@ struct TransactionsView: View {
     // MARK: - List
 
     private var listContent: some View {
-        List {
-            if viewModel.transactions.isEmpty {
-                EmptyStateView(
-                    icon: "tray",
-                    title: "No Transactions",
-                    subtitle: "Tap + to record a new transaction.",
-                    actionTitle: "Add",
-                    action: { showCreateForm = true }
-                )
-                .listRowSeparator(.hidden)
-            } else {
-                ForEach(viewModel.transactions) { tx in
-                    TransactionRowView(transaction: tx)
-                        .contentShape(Rectangle())
-                        .onTapGesture { editingTransaction = tx }
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                deletingId = tx.id
-                                Task { await viewModel.delete(id: tx.id) }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
-                        .swipeActions(edge: .leading) {
-                            Button {
-                                editingTransaction = tx
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                            .tint(.blue)
-                        }
+        ScrollView(showsIndicators: false) {
+            LazyVStack(spacing: 0, pinnedViews: []) {
+                if viewModel.transactions.isEmpty {
+                    MinimalEmptyState(
+                        icon: "tray",
+                        title: "Chưa có giao dịch",
+                        subtitle: "Nhấn + để thêm giao dịch mới",
+                        actionTitle: "Thêm ngay",
+                        action: { showCreateForm = true }
+                    )
+                    .padding(.top, 40)
+                } else {
+                    transactionList
                 }
-                if viewModel.hasMore {
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+        }
+    }
+
+    private var transactionList: some View {
+        VStack(spacing: 8) {
+            ForEach(viewModel.transactions) { tx in
+                TransactionRowView(transaction: tx)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .glassCard()
+                    .contentShape(Rectangle())
+                    .onTapGesture { editingTransaction = tx }
+                    .contextMenu {
+                        Button {
+                            editingTransaction = tx
+                        } label: {
+                            Label("Sửa", systemImage: "pencil")
+                        }
+                        Button(role: .destructive) {
+                            Task { await viewModel.delete(id: tx.id) }
+                        } label: {
+                            Label("Xoá", systemImage: "trash")
+                        }
+                    }
+            }
+
+            if viewModel.hasMore {
+                Button {
+                    Task { await viewModel.loadMore() }
+                } label: {
                     HStack {
-                        Spacer()
                         if viewModel.isLoadingMore {
                             ProgressView()
+                                .tint(Color.accentPurple)
                         } else {
-                            Button("Load More") {
-                                Task { await viewModel.loadMore() }
-                            }
-                            .font(.subheadline)
+                            Text("Tải thêm")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Color.accentPurple)
                         }
-                        Spacer()
                     }
-                    .listRowSeparator(.hidden)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .glassCard()
                 }
             }
         }
-        .listStyle(.plain)
+        .padding(.top, 8)
     }
 
     // MARK: - Filter Sheet
 
     private var filterSheet: some View {
         NavigationStack {
-            Form {
-                Section("Search") {
-                    TextField("Title...", text: $viewModel.filterTitle)
-                        .autocorrectionDisabled()
-                }
-                Section("Type") {
-                    Picker("Type", selection: $viewModel.filterType) {
-                        Text("All").tag(TransactionType?.none)
-                        Text("Income").tag(TransactionType?.some(.income))
-                        Text("Expense").tag(TransactionType?.some(.expense))
-                    }
-                    .pickerStyle(.segmented)
-                }
-                Section("Date Range") {
-                    DatePicker(
-                        "From",
-                        selection: Binding(
-                            get: { viewModel.filterFromDate ?? Date() },
-                            set: { viewModel.filterFromDate = $0 }
-                        ),
-                        displayedComponents: .date
-                    )
-                    Toggle("Has start date", isOn: Binding(
-                        get: { viewModel.filterFromDate != nil },
-                        set: { viewModel.filterFromDate = $0 ? Date() : nil }
-                    ))
+            ZStack {
+                Color.appBackground.ignoresSafeArea()
 
-                    DatePicker(
-                        "To",
-                        selection: Binding(
-                            get: { viewModel.filterToDate ?? Date() },
-                            set: { viewModel.filterToDate = $0 }
-                        ),
-                        displayedComponents: .date
-                    )
-                    Toggle("Has end date", isOn: Binding(
-                        get: { viewModel.filterToDate != nil },
-                        set: { viewModel.filterToDate = $0 ? Date() : nil }
-                    ))
-                }
-                if viewModel.isFiltered {
+                Form {
                     Section {
-                        Button("Clear All Filters", role: .destructive) {
-                            Task {
-                                await viewModel.clearFilters()
-                                showFilters = false
+                        TextField("Tìm theo tên...", text: $viewModel.filterTitle)
+                            .autocorrectionDisabled()
+                    } header: {
+                        Text("TÌM KIẾM")
+                            .foregroundStyle(Color.textTertiary)
+                    }
+
+                    Section {
+                        Picker("Loại giao dịch", selection: $viewModel.filterType) {
+                            Text("Tất cả").tag(TransactionType?.none)
+                            Text("Thu nhập").tag(TransactionType?.some(.income))
+                            Text("Chi tiêu").tag(TransactionType?.some(.expense))
+                        }
+                        .pickerStyle(.segmented)
+                    } header: {
+                        Text("LOẠI GIAO DỊCH")
+                            .foregroundStyle(Color.textTertiary)
+                    }
+
+                    Section {
+                        DatePicker(
+                            "Từ ngày",
+                            selection: Binding(
+                                get: { viewModel.filterFromDate ?? Date() },
+                                set: { viewModel.filterFromDate = $0 }
+                            ),
+                            displayedComponents: .date
+                        )
+                        Toggle("Có ngày bắt đầu", isOn: Binding(
+                            get: { viewModel.filterFromDate != nil },
+                            set: { viewModel.filterFromDate = $0 ? Date() : nil }
+                        ))
+                        DatePicker(
+                            "Đến ngày",
+                            selection: Binding(
+                                get: { viewModel.filterToDate ?? Date() },
+                                set: { viewModel.filterToDate = $0 }
+                            ),
+                            displayedComponents: .date
+                        )
+                        Toggle("Có ngày kết thúc", isOn: Binding(
+                            get: { viewModel.filterToDate != nil },
+                            set: { viewModel.filterToDate = $0 ? Date() : nil }
+                        ))
+                    } header: {
+                        Text("KHOẢNG THỜI GIAN")
+                            .foregroundStyle(Color.textTertiary)
+                    }
+
+                    if viewModel.isFiltered {
+                        Section {
+                            Button("Xoá tất cả bộ lọc", role: .destructive) {
+                                Task {
+                                    await viewModel.clearFilters()
+                                    showFilters = false
+                                }
                             }
                         }
                     }
                 }
+                .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Filter")
+            .navigationTitle("Bộ lọc")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.cardBackground, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { showFilters = false }
+                    Button("Huỷ") { showFilters = false }
+                        .foregroundStyle(Color.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Apply") {
+                    Button("Áp dụng") {
                         Task {
                             await viewModel.applyFilters()
                             showFilters = false
                         }
                     }
                     .fontWeight(.semibold)
+                    .foregroundStyle(Color.accentPurple)
                 }
             }
         }

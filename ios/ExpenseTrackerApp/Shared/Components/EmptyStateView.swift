@@ -1,5 +1,6 @@
 import SwiftUI
 
+// Legacy empty state view - kept for Calendar and other views not yet refactored
 struct EmptyStateView: View {
     let icon: String
     let title: String
@@ -8,34 +9,25 @@ struct EmptyStateView: View {
     var action: (() -> Void)? = nil
 
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 52))
-                .foregroundStyle(.tertiary)
-            VStack(spacing: 6) {
-                Text(title)
-                    .font(.headline)
-                Text(subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            if let actionTitle, let action {
-                Button(actionTitle, action: action)
-                    .buttonStyle(.borderedProminent)
-            }
-        }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        MinimalEmptyState(
+            icon: icon,
+            title: title,
+            subtitle: subtitle,
+            actionTitle: actionTitle,
+            action: action
+        )
     }
 }
 
 #Preview {
-    EmptyStateView(
-        icon: "tray",
-        title: "No Transactions",
-        subtitle: "Tap + to add your first transaction.",
-        actionTitle: "Add Transaction",
-        action: {}
-    )
+    ZStack {
+        Color.appBackground.ignoresSafeArea()
+        EmptyStateView(
+            icon: "tray",
+            title: "Chưa có dữ liệu",
+            subtitle: "Nhấn + để thêm mục mới",
+            actionTitle: "Thêm ngay",
+            action: {}
+        )
+    }
 }

@@ -10,6 +10,7 @@ namespace ExpenseTracker.Application.Services;
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _repository;
+    private readonly ICategoryRepository    _categoryRepository;
     private readonly IServiceScopeFactory   _scopeFactory;
 
     /// <summary>CategoryId "Lương" seed cố định. Dùng để detect salary transaction.</summary>
@@ -17,10 +18,12 @@ public class TransactionService : ITransactionService
 
     public TransactionService(
         ITransactionRepository repository,
+        ICategoryRepository    categoryRepository,
         IServiceScopeFactory   scopeFactory)
     {
-        _repository   = repository;
-        _scopeFactory = scopeFactory;
+        _repository         = repository;
+        _categoryRepository = categoryRepository;
+        _scopeFactory       = scopeFactory;
     }
 
     // ========================
@@ -58,13 +61,21 @@ public class TransactionService : ITransactionService
 
     public async Task<TransactionDto> CreateAsync(CreateTransactionDto dto)
     {
+        await ValidateCategoryAsync(dto.CategoryId, dto.Type);
+
+        // Npgsql requires DateTimeKind.Utc for timestamptz columns.
+        // iOS may send date-only strings parsed as Unspecified — normalise to UTC.
+        var dateUtc = dto.Date.Kind == DateTimeKind.Utc
+            ? dto.Date
+            : DateTime.SpecifyKind(dto.Date, DateTimeKind.Utc);
+
         var transaction = new Transaction
         {
             Title      = dto.Title,
             Amount     = dto.Amount,
             Type       = dto.Type,
             CategoryId = dto.CategoryId,
-            Date       = dto.Date,
+            Date       = dateUtc,
             Note       = dto.Note
         };
 
@@ -105,11 +116,17 @@ public class TransactionService : ITransactionService
         var existing = await _repository.GetByIdAsync(id);
         if (existing is null) return null;
 
+        await ValidateCategoryAsync(dto.CategoryId, dto.Type);
+
+        var dateUtc = dto.Date.Kind == DateTimeKind.Utc
+            ? dto.Date
+            : DateTime.SpecifyKind(dto.Date, DateTimeKind.Utc);
+
         existing.Title = dto.Title;
         existing.Amount = dto.Amount;
         existing.Type = dto.Type;
         existing.CategoryId = dto.CategoryId;
-        existing.Date = dto.Date;
+        existing.Date = dateUtc;
         existing.Note = dto.Note;
 
         var updated = await _repository.UpdateAsync(existing);
@@ -200,4 +217,14 @@ public class TransactionService : ITransactionService
         Note = t.Note,
         CreatedAt = t.CreatedAt
     };
+
+    private async Task ValidateCategoryAsync(Guid categoryId, TransactionType type)
+    {
+        var category = await _categoryRepository.GetByIdAsync(categoryId);
+        if (category is null)
+            throw new InvalidOperationException("Danh mục không tồn tại.");
+
+        if (category.Type != type)
+            throw new InvalidOperationException("Danh mục không khớp với loại giao dịch đã chọn.");
+    }
 }

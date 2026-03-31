@@ -54,8 +54,15 @@ public class TransactionController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        try
+        {
+            var result = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     // PUT api/transaction/{id}
@@ -65,11 +72,18 @@ public class TransactionController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var result = await _service.UpdateAsync(id, dto);
-        if (result is null)
-            return NotFound(new { message = $"Transaction {id} not found" });
+        try
+        {
+            var result = await _service.UpdateAsync(id, dto);
+            if (result is null)
+                return NotFound(new { message = $"Transaction {id} not found" });
 
-        return Ok(result);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     // DELETE api/transaction/{id}

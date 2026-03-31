@@ -18,6 +18,12 @@ struct DebtPaymentFormView: View {
                 HStack {
                     TextField("Amount", text: $vm.amount)
                         .keyboardType(.decimalPad)
+                        .onChange(of: vm.amount) { _, newValue in
+                            let formatted = newValue.formattedAmount
+                            if vm.amount != formatted {
+                                vm.amount = formatted
+                            }
+                        }
                     Text("₫").foregroundStyle(.secondary)
                 }
                 Text("Max: \(vm.maxAmount.currency)")
@@ -76,12 +82,13 @@ final class DebtPaymentFormViewModel: ObservableObject {
     }
 
     var canSave: Bool {
-        guard let v = Double(amount) else { return false }
+        let v = amount.rawAmount
         return v > 0 && v <= maxAmount
     }
 
     func save() async -> Bool {
-        guard let v = Double(amount), v > 0 else {
+        let v = amount.rawAmount
+        guard v > 0 else {
             error = "Please enter a valid amount."
             return false
         }

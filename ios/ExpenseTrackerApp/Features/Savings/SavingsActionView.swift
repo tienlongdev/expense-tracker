@@ -38,6 +38,12 @@ struct SavingsActionView: View {
                 HStack {
                     TextField(vm.selectedAction == .updateValue ? "New Value" : "Amount", text: $vm.amount)
                         .keyboardType(.decimalPad)
+                        .onChange(of: vm.amount) { _, newValue in
+                            let formatted = newValue.formattedAmount
+                            if vm.amount != formatted {
+                                vm.amount = formatted
+                            }
+                        }
                     Text("₫").foregroundStyle(.secondary)
                 }
                 DatePicker("Date", selection: $vm.date, displayedComponents: .date)
@@ -110,10 +116,11 @@ final class SavingsActionViewModel: ObservableObject {
         self.onSave = onSave
     }
 
-    var canApply: Bool { (Double(amount) ?? 0) > 0 }
+    var canApply: Bool { amount.rawAmount > 0 }
 
     func apply() async -> Bool {
-        guard let v = Double(amount), v > 0 else {
+        let v = amount.rawAmount
+        guard v > 0 else {
             error = "Please enter a valid amount."
             return false
         }

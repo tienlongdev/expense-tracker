@@ -10,10 +10,10 @@ final class DebtViewModel: ObservableObject {
     @Published var selectedTab: DebtTab = .all
 
     enum DebtTab: String, CaseIterable, Identifiable {
-        case all = "All"
-        case borrowed = "Borrowed"
-        case lent = "Lent"
-        case overdue = "Overdue"
+        case all = "Tất cả"
+        case borrowed = "Đang vay"
+        case lent = "Cho vay"
+        case overdue = "Quá hạn"
         var id: String { rawValue }
     }
 

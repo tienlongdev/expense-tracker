@@ -29,6 +29,7 @@ enum AppGradient {
 extension Color {
     static let appBackground = Color(hex: "#0B1020")
     static let cardBackground = Color(hex: "#141A2E")
+    static let surfaceColor = Color(hex: "#1B233A")
     static let textPrimary = Color(hex: "#F8FAFC")
     static let textSecondary = Color(hex: "#94A3B8")
     static let textTertiary = Color(hex: "#64748B")

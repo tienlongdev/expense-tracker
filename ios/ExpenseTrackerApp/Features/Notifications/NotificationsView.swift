@@ -4,6 +4,11 @@ struct NotificationsView: View {
     @StateObject private var viewModel = NotificationsViewModel()
     @EnvironmentObject private var appState: AppState
     @Environment(\.dismiss) private var dismiss
+    let onClose: (() -> Void)?
+
+    init(onClose: (() -> Void)? = nil) {
+        self.onClose = onClose
+    }
 
     var body: some View {
         Group {
@@ -31,7 +36,7 @@ struct NotificationsView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button("Done") { dismiss() }
+            Button("Done") { close() }
         }
         ToolbarItem(placement: .topBarTrailing) {
             if viewModel.unreadCount > 0 {
@@ -43,6 +48,14 @@ struct NotificationsView: View {
                 }
                 .font(.subheadline)
             }
+        }
+    }
+
+    private func close() {
+        if let onClose {
+            onClose()
+        } else {
+            dismiss()
         }
     }
 

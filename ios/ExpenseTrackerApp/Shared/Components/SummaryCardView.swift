@@ -1,5 +1,6 @@
 import SwiftUI
 
+// SummaryCardView is kept for backward compatibility but styled to match the dark theme
 struct SummaryCardView: View {
     let title: String
     let amount: Double
@@ -11,31 +12,39 @@ struct SummaryCardView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(tint)
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .padding(7)
+                    .background(tint.opacity(0.15), in: Circle())
+                Spacer()
             }
             Text(amount.currency)
                 .font(.title3.bold())
+                .foregroundStyle(Color.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+            Text(title)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Color.textSecondary)
             if let subtitle {
                 Text(subtitle)
                     .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(Color.textTertiary)
             }
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+        .glassCard()
     }
 }
 
 #Preview {
-    HStack {
-        SummaryCardView(title: "Income", amount: 5_000_000, icon: "arrow.down.circle.fill", tint: .green)
-        SummaryCardView(title: "Expense", amount: 2_300_000, icon: "arrow.up.circle.fill", tint: .red)
+    ZStack {
+        Color.appBackground.ignoresSafeArea()
+        HStack {
+            SummaryCardView(title: "Thu nhập", amount: 5_000_000, icon: "arrow.down.circle.fill", tint: Color.incomeGreen)
+            SummaryCardView(title: "Chi tiêu", amount: 2_300_000, icon: "arrow.up.circle.fill", tint: Color.expenseRed)
+        }
+        .padding()
     }
-    .padding()
 }

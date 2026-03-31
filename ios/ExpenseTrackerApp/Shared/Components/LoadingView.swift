@@ -1,20 +1,22 @@
 import SwiftUI
 
 struct LoadingView: View {
-    var message: String = "Loading..."
-
     var body: some View {
         VStack(spacing: 16) {
             ProgressView()
-                .controlSize(.large)
-            Text(message)
+                .tint(Color.accentPurple)
+                .scaleEffect(1.3)
+            Text("Đang tải...")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 #Preview {
-    LoadingView()
+    ZStack {
+        Color.appBackground.ignoresSafeArea()
+        LoadingView()
+    }
 }
